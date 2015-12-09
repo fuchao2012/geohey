@@ -1,0 +1,320 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+	<div id="buttonContainer" style="z-index: 1; display:none; position: absolute; bottom: 0px; padding: 10px; background: #000;">
+		<input id="btn-osm" type="button" value="OpenStreetMap">
+		<input id="btn-bd-street" type="button" value="百度街道图">
+		<input id="btn-bd-sate" type="button" value="百度卫星图">
+		<input id="btn-bd-traffic" type="button" value="百度街道图＋路况">
+		<input id="btn-googlecn-street" type="button" value="Google街道图">
+		<input id="btn-googlecn-terrian" type="button" value="Google地形图＋路况">
+		<input id="btn-googlecn-sate" type="button" value="Google卫星图＋路况">
+		<input id="btn-amap-street" type="button" value="高德街道图">
+		<input id="btn-amap-sate" type="button" value="高德卫星图">
+		<input id="btn-amap-traffic" type="button" value="高德街道图＋路况">
+		<input id="btn-qq-street" type="button" value="腾讯街道图">
+		<input id="btn-qq-sate" type="button" value="腾讯卫星图">
+		<input id="btn-alimap" type="button" value="阿里云地图">
+		<input id="btn-bingmap" type="button" value="Bing地图＋路况">
+		<input id="btn-cartomap-midnight" type="button" value="Carto夜间">
+		<input id="btn-cartomap-eco" type="button" value="Carto清爽">
+		<input id="btn-cartomap-blue" type="button" value="Carto蓝色">
+		<input id="btn-cartomap-antique" type="button" value="Carto古旧">
+		<input id="btn-tianditu-street" type="button" value="天地图街道图">
+		<input id="btn-tianditu-sate" type="button" value="天地图卫星图">
+		<input id="btn-tianditu-terrain" type="button" value="天地图地形图">
+		<input id="btn-nasa-temp" type="button" value="NASA陆地气温图">
+	</div>
+
+
+	<script type="text/javascript">
+		var map, layer;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer', {continuouslyZoom:false, pinchRotate: false});
+
+			var tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+			tileLayer.addTo(map);
+
+			var clearLayers = function(){
+				var layers = map.getLayers();
+				for(var i in layers){
+					map.getLayer(i).remove();
+				}
+			};
+
+			var adjustByLayer = function(layer){
+				map.options.minRes = layer.options.minRes;
+				map.options.maxRes = layer.options.maxRes;
+
+				var res = map.getResolution();
+				if( res > map.options.maxRes){
+					res = map.options.maxRes;
+				}
+				if( res < map.options.minRes){
+					res = map.options.minRes;
+				}
+
+				var size = map.getSize();
+
+				var center = map.getCenter();
+				if (layer.options.srid != map.options.srid) {
+					map.options.srid = layer.options.srid;
+					center = [0, 0];
+					res = layer.options.maxRes;
+				}
+
+				map.view(center, size[0]*res, size[1]*res, map.getRotate());
+			};
+
+			G.loadModule('maps', function() {
+
+				$('#btn-osm').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.OpenStreetMap();
+					map.addLayer(layer);
+
+					adjustByLayer(layer);
+				});
+
+				$('#btn-bd-street').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.BaiduMap('street');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-bd-sate').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.BaiduMap('sate');
+					map.addLayer(layer);
+					layer = new G.Layer.BaiduMap('satel');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-bd-traffic').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.BaiduMap('street');
+					map.addLayer(layer);
+					layer = new G.Layer.BaiduMap('traffic');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-googlecn-street').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.GoogleCnMap('street');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-googlecn-terrian').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.GoogleCnMap('terrian', {traffic:true});
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-googlecn-sate').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.GoogleCnMap('satel', {traffic:true});
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-amap-street').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.AMap('street');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-amap-sate').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.AMap('sate');
+					map.addLayer(layer);
+
+					layer = new G.Layer.AMap('satel');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-amap-traffic').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.AMap('street2');
+					map.addLayer(layer);
+
+					layer = new G.Layer.AMap('traffic');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-qq-street').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.QQMap('street');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-qq-sate').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.QQMap('sate');
+					map.addLayer(layer);
+
+					layer = new G.Layer.QQMap('satel');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-alimap').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.AliMap();
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-bingmap').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.BingMap('street');
+					map.addLayer(layer);
+
+					layer = new G.Layer.BingMap('traffic');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-cartomap-midnight').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.CartoMap('midnight');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-cartomap-eco').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.CartoMap('eco');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-cartomap-blue').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.CartoMap('flatblue');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-cartomap-antique').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.CartoMap('antique');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-tianditu-street').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.TiandituMap('street');
+					map.addLayer(layer);
+
+					layer = new G.Layer.TiandituMap('streetl');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-tianditu-sate').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.TiandituMap('sate');
+					map.addLayer(layer);
+
+					layer = new G.Layer.TiandituMap('satel');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-tianditu-terrain').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.TiandituMap('terrain');
+					map.addLayer(layer);
+
+					layer = new G.Layer.TiandituMap('terrainl');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+				$('#btn-nasa-temp').bind('click', function(){
+					clearLayers();
+
+					layer = new G.Layer.NasaMap(//
+						'MODIS_Aqua_Land_Surface_Temp_Day', //
+						null, //
+						3857, //
+						'1km', //
+						'png');
+					map.addLayer(layer);
+					
+					adjustByLayer(layer);
+				});
+
+
+
+
+				$('#buttonContainer').fadeIn();
+			});
+		});
+
+	</script>
+	
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../3rd/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="../lib/g.css">
+<link rel="stylesheet" href="../3rd/powerange/powerange.min.css" />
+<script src="../3rd/powerange/powerange.min.js"></script>
+<script type="text/javascript">
+	G_ON_WEBGL=true
+</script>
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="./data/world-countries.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer', {
+				srid: 4326,
+				originX: -180,
+				originY: 90,
+				minX: -180,
+				maxX: 180,
+				minY: -90,
+				maxY: 90,
+				minRes: 0.00000536441802978515,
+				maxRes: 0.3515625,
+				glColor: '#666',
+				initStatus: {
+					center: [0, 0],
+					res: 0.3515625,
+					rotate: 0
+				}
+			});
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			var graphicOptions = {
+				fillColor: '#000',
+				fillOpacity: 1,
+				outline: false
+			};
+
+			var country, countryId, countryData, geom, g;
+			var partKey, partGeom;
+			for (var i = G.data.WorldCountries.length - 1; i >= 0; i--) {
+				country = G.data.WorldCountries[i];
+				geom = country.geom;
+				countryId = country.attrs.id;
+
+				if(!country.geom.m){
+					g = new G.Graphic.Polygon(geom, country.attrs, graphicOptions);
+					g.addTo(graphicLayer);
+				}else{
+					for (partKey in geom.m) {
+						partGeom = geom.m[partKey];
+						
+						g = new G.Graphic.Polygon(partGeom, country.attrs, graphicOptions);
+						g.addTo(graphicLayer);
+					}
+				}
+			}
+
+			G.loadModule('anim', function() {
+
+				var flash = function(x, y){
+					g = new G.Graphic.AnimPoint(
+							new G.Graphic.Point([x, y], null, {
+								size:[48, 48],
+								fillOpacity: 0,
+								fillColor: '#666',
+								gradual: true
+							}), 
+							new G.Graphic.Point([x, y], null, {
+								size:[2, 2],
+								fillOpacity: 0,
+								fillColor: '#666',
+								gradual: true
+							}),{
+								duration: 4,
+								repeatCount: 1
+							}
+						);
+					g.addTo(graphicLayer);
+					g.play();
+				}
+
+				for(var i=100; i>=0; i--){
+					setTimeout(function(){
+						for(var j=100; j>=0; j--){
+							var x = -180 + 360 * Math.random();
+							var y = -90 + 180 * Math.random();
+							flash(x, y);
+						};
+					}, 500*i);
+				}
+
+
+			});
+
+
+		});
+
+
+
+
+	</script>
+	
+</body>
+</html>

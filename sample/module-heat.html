@@ -1,0 +1,46 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%">
+	<div id="mapContainer" style="width: 100%; height: 100%; background:#ccc"></div>
+
+	<script type="text/javascript">
+		var map, tileLayer, heatLayer;
+		
+		G.ready(function() {
+			map = new G.Map('mapContainer', {wrap:false, initStatus:{
+				res:19567.879241
+			}});
+
+			map.addListener('click', function(e){
+				heatLayer.addDataPoint(e.mapX, e.mapY, 1, true);
+			});
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});			
+			tileLayer.addTo(map);
+
+			G.loadModule('heat', function() {
+				heatLayer = new G.Layer.Heat({topValue:2, radius:40, radiusUnit:'pixel', maxOpacity:0.2});
+				heatLayer.addTo(map);
+
+				for(var i=0; i<100; i++){
+					heatLayer.addDataPoint(-2e7 + 4e7*Math.random(), -2e7 + 4e7*Math.random());
+				}
+
+				map.redraw();
+			});
+
+		});
+
+	</script>
+	
+</body>
+</html>

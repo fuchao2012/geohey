@@ -1,0 +1,186 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+<script type="text/javascript" src="./data/china-provinces.js"></script>
+<script type="text/javascript" src="./data/china-beijing.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+	<div style="z-index: 1; position: absolute; top: 0px; padding: 10px;">
+		<input id="btn-china" type="button" value="查看全国政区图" onclick="showProvinces()">
+	</div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, chinaLayer, provinceLayer, nameLayer;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer', {
+				wrap: false,
+				maxRes: 9783.939621,
+				initStatus: {
+					center: [11673975, 4579823],
+					res: 9783.939621,
+					rotate: 0
+				}
+			});
+
+			chinaLayer = new G.Layer.Graphic();
+			chinaLayer.addTo(map);
+
+			provinceLayer = new G.Layer.Graphic();
+			provinceLayer.addTo(map);
+
+			nameLayer = new G.Layer.Graphic();
+			nameLayer.addTo(map);
+
+			chinaLayer.addListener('graphicClicked', function(e){
+				var g = e.graphic;
+
+				drillProvince(g);
+			});
+
+			showProvinces();
+		});
+
+		function showProvinces(){
+			$('#btn-china').hide();
+
+			nameLayer.clear();
+			chinaLayer.clear();
+			provinceLayer.clear();
+
+			var graphicOptions = {
+				outlineColor: '#fff',
+				outlineWidth: 1,
+				lineHighlightWiden: 1,
+				clickable: true
+			};
+
+			var province, provinceCode, provinceName, geom, g;
+			var partKey, partGeom;
+			for (var i = G.data.ChinaProvinces.length - 1; i >= 0; i--) {
+				province = G.data.ChinaProvinces[i];
+				provinceName = province.attrs.name;
+				provinceCode = province.attrs.code;
+
+				if(provinceCode=='110000'){
+					graphicOptions.fillColor = '#000';
+					graphicOptions.fillOpacity = 0.8;
+					graphicOptions.clickable = true;
+				}else{
+					var md = (provinceCode/10000)%5;
+					if(md==0){
+						graphicOptions.fillColor = '#090';
+					}else if(md==1){
+						graphicOptions.fillColor = '#009';
+					}else if(md==2){
+						graphicOptions.fillColor = '#066';
+					}else if(md==3){
+						graphicOptions.fillColor = '#660';
+					}else{
+						graphicOptions.fillColor = '#606';
+					}
+					graphicOptions.fillOpacity = 0.3;
+					graphicOptions.clickable = false;
+				}
+
+				geom = province.attrs['label_point'];
+				geom = G.ProjUtil.projectPoint(geom, G.Proj.WebMercator.project);
+				g = new G.Graphic.Point(geom, null, {
+					shape: 'text',
+					size: [12],
+					fillColor: '#fff',
+					text: provinceName
+				});
+				g.addTo(nameLayer);
+
+				geom = province.geom;
+				if(!geom.m){
+					geom = G.ProjUtil.projectPolygon(geom, G.Proj.WebMercator.project);
+					g = new G.Graphic.Polygon(geom, province.attrs, graphicOptions);
+					g.addTo(chinaLayer);
+				}else{
+					for (partKey in geom.m) {
+						partGeom = geom.m[partKey];
+						
+						partGeom = G.ProjUtil.projectPolygon(partGeom, G.Proj.WebMercator.project);
+						g = new G.Graphic.Polygon(partGeom, province.attrs, graphicOptions);
+						g.addTo(chinaLayer);
+					}
+				}
+			}
+
+			map.zoomRes([11673975, 4579823], 9783.939621);
+		};
+
+		function drillProvince(province){
+			$('#btn-china').show();
+
+			nameLayer.clear();
+			chinaLayer.clear();
+			provinceLayer.clear();
+
+			var code = province.attrs.code;
+
+			var data;
+			if(code == '110000'){
+				data = G.data.ChinaBeijing;
+			}
+
+			var graphicOptions = {
+				fillColor: '#000',
+				fillOpacity: 0.8,
+				outlineColor: '#fff',
+				outlineWidth: 1,
+				lineHighlightWiden: 1
+			};
+
+			var city, cityCode, cityName, geom, g;
+			var partKey, partGeom;
+			for (var i = data.length - 1; i >= 0; i--) {
+				city = data[i];
+				cityName = city.attrs.name;
+				cityCode = city.attrs.code;
+
+				geom = city.attrs['label_point'];
+				geom = G.ProjUtil.projectPoint(geom, G.Proj.WebMercator.project);
+				g = new G.Graphic.Point(geom, null, {
+					shape: 'text',
+					size: [12],
+					fillColor: '#fff',
+					text: cityName
+				});
+				g.addTo(nameLayer);
+
+				geom = city.geom;
+				if(!geom.m){
+					geom = G.ProjUtil.projectPolygon(geom, G.Proj.WebMercator.project);
+					g = new G.Graphic.Polygon(geom, city.attrs, graphicOptions);
+					g.addTo(provinceLayer);
+				}else{
+					for (partKey in geom.m) {
+						partGeom = geom.m[partKey];
+						
+						partGeom = G.ProjUtil.projectPolygon(partGeom, G.Proj.WebMercator.project);
+						g = new G.Graphic.Polygon(partGeom, city.attrs, graphicOptions);
+						g.addTo(provinceLayer);
+					}
+				}
+			}
+
+			map.zoomExtent(province.bbox);
+		};
+
+
+
+	</script>
+	
+</body>
+</html>

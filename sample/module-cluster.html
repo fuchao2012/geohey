@@ -1,0 +1,78 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%">
+	<div id="mapContainer" style="width: 100%; height: 100%; background:#ccc"></div>
+	<div id="buttonContainer" style="z-index: 1; display:none; position: absolute; top: 0px; padding: 10px;">
+		<input id="btn-clear" type="button" value="清空">
+		<input id="btn-add" type="button" value="随机添加点">
+	</div>
+
+	<script type="text/javascript">
+		var map, tileLayer, clusterLayer, addPoint;
+		
+		G.ready(function() {
+			map = new G.Map('mapContainer');
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});			
+			tileLayer.addTo(map);
+
+			G.loadModule('cluster', function() {
+				clusterLayer = new G.Layer.Cluster({
+					clusterClickable: true,
+					pointClickable: true,
+					breakValues: [3, 5, 10]
+				});
+				clusterLayer.addTo(map);
+
+				clusterLayer.addListener('clusterClicked', onClusterClicked);		
+
+				function onClusterClicked(e) {
+					var c = e.cluster;
+
+					clusterLayer.diveIn(c);
+				}
+
+				addPoint = function(x, y){
+					var g = new G.Graphic.Point([x, y], null, {
+						shape: 'circle',
+						size: [12],
+						fillColor: '#333',
+						fillOpacity: 1.0
+					});
+					clusterLayer.addPoint(g);
+				}
+
+				for (var i = 0; i < 100; i++) {
+					addPoint(-2e7 + 4e7 * Math.random(), -2e7 + 4e7 * Math.random());
+				}
+
+				map.redraw();
+
+
+				$('#btn-add').bind('click', function(){
+					addPoint(-2e7 + 4e7 * Math.random(), -2e7 + 4e7 * Math.random());
+					map.redraw();
+				});
+
+				$('#btn-clear').bind('click', function(){
+					clusterLayer.clear();
+				});
+
+				$('#buttonContainer').fadeIn();
+			});
+
+		});
+
+	</script>
+	
+</body>
+</html>

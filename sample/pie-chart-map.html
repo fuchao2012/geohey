@@ -1,0 +1,185 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+<script type="text/javascript" src="../3rd/highcharts.js"></script>
+<script type="text/javascript" src="./data/world-countries.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+	<div style="z-index: 1; position: absolute; bottom: 0px; width: 100%; text-align: center">
+		<h3>2014年10月 浏览器占有率 （来源：StatCounter）</h3>
+	</div>
+
+	<script type="text/javascript">
+		var map, graphicLayer, htmlLayer;
+
+		var dataList = [
+			{
+				x: 116,
+				y: 40,
+				name: '中国',
+				value: [48.31, 25.5, 3.18, 4.65]
+			},
+			{
+				x: 78,
+				y: 20,
+				name: '印度',
+				value: [59.92, 8.87, 2.26, 23.68]
+			},
+			{
+				x: -100,
+				y: 36,
+				name: '美国',
+				value: [33.81, 28.88, 16.5, 13.98]
+			},
+			{
+				x: 10,
+				y: 50,
+				name: '德国',
+				value: [27.15, 15.35, 9.89, 41.94]
+			},
+			{
+				x: -50,
+				y: -10,
+				name: '巴西',
+				value: [71.9, 10.75, 4.27, 10.78]
+			}
+		];
+
+
+	    Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, 
+	    	function (color) {
+		        return {
+		            radialGradient: { cx: 0.5, cy: 0.5, r: 0.7 },
+		            stops: [
+		                [0, color],
+		                [1, Highcharts.Color(color).brighten(-0.5).get('rgb')] // darken
+		            ]
+	        };
+	    });
+
+		G.ready(function() {
+
+			map = new G.Map('mapContainer', {
+				doubleZoom: false,
+				scrollZoom: false,
+				pinchZoom: false,
+				srid: 4326,
+				originX: -180,
+				originY: 90,
+				minX: -180,
+				maxX: 180,
+				minY: -90,
+				maxY: 90,
+				minRes: 0.00000536441802978515,
+				maxRes: 0.3515625,
+				initStatus: {
+					center: [0, 0],
+					res: 0.3515625,
+					rotate: 0
+				}
+			});
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			var graphicOptions = {
+				fillColor: '#fff',
+				fillOpacity: 1,
+				outlineColor: '#bbb',
+				outlineWidth: 1,
+				outlineDashArray: [3, 3]
+			};
+
+			var country, countryId, countryData, geom, g;
+			var partKey, partGeom;
+			for (var i = G.data.WorldCountries.length - 1; i >= 0; i--) {
+				country = G.data.WorldCountries[i];
+				geom = country.geom;
+				countryId = country.attrs.id;
+
+				if(!country.geom.m){
+					g = new G.Graphic.Polygon(geom, country.attrs, graphicOptions);
+					g.addTo(graphicLayer);
+				}else{
+					for (partKey in geom.m) {
+						partGeom = geom.m[partKey];
+						
+						g = new G.Graphic.Polygon(partGeom, country.attrs, graphicOptions);
+						g.addTo(graphicLayer);
+					}
+				}
+			}
+
+
+			htmlLayer = (new G.Layer.Html()).addTo(map);
+
+
+			var data, pieId;
+			for (var i = dataList.length - 1; i >= 0; i--) {
+				data = dataList[i];
+
+				pieId = 'pie-' + i;
+				htmlLayer.addHtml('<div id="' + pieId + '" style="width: 160px; height: 160px; margin-left: -80px; margin-top: -80px;"></div>', data.x, data.y);
+
+
+				$('#' + pieId + '').highcharts({
+			        chart: {
+			        	backgroundColor: null,
+			            plotBackgroundColor: null,
+			            plotBorderWidth: 0,
+			            plotShadow: false
+			        },
+			        credits: {
+			        	enabled: false
+			        },
+			        title: {
+			            text: data.name,
+			            align: 'center',
+			            verticalAlign: 'middle',
+			            y: 5
+			        },
+			        plotOptions: {
+			            pie: {
+			                allowPointSelect: false,
+			                cursor: 'pointer',
+			                dataLabels: {
+			                    enabled: true,
+			                    distance: -5,
+			                    style: {
+			                        fontWeight: 'bold',
+			                        color: 'white',
+			                        textShadow: '0px 1px 2px black'
+			                    }
+			                },
+			                startAngle: -180,
+			                endAngle: 180,
+			                center: ['50%', '50%']
+			            }
+			        },
+			        series: [{
+			            type: 'pie',
+			            name: data.name + '占有率',
+			            innerSize: '50%',
+			            data: [
+			                ['Chrome', data.value[0]],
+			                ['IE', data.value[1]],
+			                ['Safari', data.value[2]],
+			                ['Firefox', data.value[3]]
+			            ]
+			        }]
+			    });
+			};
+			
+
+		});
+
+	</script>
+</body>
+</html>

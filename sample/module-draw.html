@@ -1,0 +1,120 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+	<div id="buttonContainer" style="z-index: 1; display:none; position: absolute; top: 0px; padding: 10px;">
+		<input id="btn-end" type="button" value="退出绘制状态" disabled="disabled">
+		<input id="btn-circle" type="button" value="圆形">
+		<input id="btn-point" type="button" value="点">
+		<input id="btn-polyline" type="button" value="线">
+		<input id="btn-freepolyline" type="button" value="手绘线">
+		<input id="btn-polygon" type="button" value="多边形">
+		<input id="btn-freepolygon" type="button" value="手绘多边形">
+		<input id="btn-rect" type="button" value="矩形">
+		<input id="btn-arrow" type="button" value="箭头">
+	</div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, drawLayer, g;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer');
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+			tileLayer.addTo(map);
+
+			map.view([0, 0], 2e6, 2e6);
+
+			G.loadModule('draw', function() {
+				drawLayer = new G.Layer.Draw();
+				drawLayer.addTo(map);
+
+				drawLayer.addListener('drawStart', function(e){
+					console.log(e.type, e);
+				}).addListener('draw', function(e){
+					console.log(e.type, e);
+				}).addListener('drawEnd', function(e){
+					console.log(e.type, e);
+				});
+
+				var ensureDisabledButton = function(name){
+					$('#btn-end').removeAttr('disabled');
+					$('#btn-circle').removeAttr('disabled');
+					$('#btn-point').removeAttr('disabled');
+					$('#btn-polyline').removeAttr('disabled');
+					$('#btn-freepolyline').removeAttr('disabled');
+					$('#btn-polygon').removeAttr('disabled');
+					$('#btn-freepolygon').removeAttr('disabled');
+					$('#btn-rect').removeAttr('disabled');
+					$('#btn-arrow').removeAttr('disabled');
+
+					if(name){
+						$('#btn-' + name).attr('disabled', 'disabled');
+					}
+				};
+
+				$('#btn-end').bind('click', function(){
+					drawLayer.endDraw();
+					ensureDisabledButton('end');
+				});
+
+				$('#btn-circle').bind('click', function(){
+					drawLayer.startDraw('circle', {fillColor:"#f00"});
+					ensureDisabledButton('circle');
+				});
+
+				$('#btn-point').bind('click', function(){
+					drawLayer.startDraw('point');
+					ensureDisabledButton('point');
+				});
+
+				$('#btn-polyline').bind('click', function(){
+					drawLayer.startDraw('polyline');
+					ensureDisabledButton('polyline');
+				});
+
+				$('#btn-freepolyline').bind('click', function(){
+					drawLayer.startDraw('freepolyline');
+					ensureDisabledButton('freepolyline');
+				});
+
+				$('#btn-polygon').bind('click', function(){
+					drawLayer.startDraw('polygon');
+					ensureDisabledButton('polygon');
+				});
+
+				$('#btn-freepolygon').bind('click', function(){
+					drawLayer.startDraw('freepolygon');
+					ensureDisabledButton('freepolygon');
+				});
+
+				$('#btn-rect').bind('click', function(){
+					drawLayer.startDraw('rect');
+					ensureDisabledButton('rect');
+				});
+
+				$('#btn-arrow').bind('click', function(){
+					drawLayer.startDraw('arrow');
+					ensureDisabledButton('arrow');
+				});
+
+				$('#buttonContainer').fadeIn();
+			});
+		});
+
+	</script>
+	
+</body>
+</html>

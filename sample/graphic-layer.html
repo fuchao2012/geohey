@@ -1,0 +1,259 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer, highlightGraphic;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer');
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+
+			tileLayer.addTo(map);
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+			graphicLayer.setStyle(['a', 'b'], ['=="test"', '<0.5'], {
+				fillColor: '#000'
+			});
+			graphicLayer.setStyle(['a', 'b'], ['=="test"', '>=0.5'], {
+				fillColor: '#f00'
+			});
+
+			graphicLayer.addListener('graphicClicked', onGraphicClicked);
+			graphicLayer.addListener('graphicOver', onGraphicOver);
+			graphicLayer.addListener('graphicOut', onGraphicOut);
+
+			
+			var x, y, value, g;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7;
+				y = -2e7 + 4e7 * i / iLen;
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'image',
+					size: [25, 40],
+					offset: [-12, -40],
+					image: '../lib/images/pin{i}.png',
+					imageRotate: 360 * i / iLen,
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 4e6;
+				y = -2e7 + 4e7 * i / iLen;
+				value = i / iLen;
+				g = new G.Graphic.Point([x, y], {
+					a: 'test',
+					b: value
+				}, {
+					shape: 'rect',
+					size: [16, 64 * value],
+					offset: [0, -32 * value],
+					fillColor: '#f00',
+					fillOpacity: 0.5,
+					outlineWidth: 8,
+					lineHighlightWiden: 1,
+					gradual: true,
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+			
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 8e6;
+				y = -2e7 + 4e7 * i / iLen;
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'circle',
+					size: [32],
+					fillColor: '#000',
+					fillOpacity: 0.2,
+					outlineWidth: 8,
+					lineHighlightWiden: 3,
+					gradual: true,
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+			
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 12e6;
+				y = -2e7 + 4e7 * i / iLen;
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'text',
+					size: [16],
+					offset: [0, -6],
+					fillColor: '#033',
+					fillOpacity: 0.5,
+					text: i,
+					textFont: 'Microsoft YaHei',
+					textStyle: 'bold',
+					textAlign: 'left',
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'circle',
+					size: [4]
+				});
+				g.addTo(graphicLayer);
+			}
+
+			var x1, y1, x2, y2, x3, y3, g;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x1 = -2e7 + 14e6;
+				y1 = -2e7 + 4e7 * i / iLen;
+				x2 = x1 + 3e6;
+				y2 = y1 + 3e6;
+				x3 = x2 + 3e6;
+				y3 = y2 - 3e6;
+				g = new G.Graphic.Polyline([
+					[x1, y1],
+					[x2, y2],
+					[x3, y3]
+				], null, {
+					lineWidth: 6,
+					lineDashArray: [20, 10],
+					lineColor: '#00f',
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+
+			var x, y, g;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 22e6;
+				y = -2e7 + 4e7 * i / iLen;
+				g = new G.Graphic.Polygon([
+					[
+						[x, y],
+						[x, y + 3e6],
+						[x + 3e6, y + 3e6],
+						[x + 3e6, y]
+					],
+					[
+						[x + 1e6, y + 2e6],
+						[x + 1e6, y + 1e6],
+						[x + 2e6, y + 1e6],
+						[x + 2e6, y + 2e6]
+					]
+				], null, {
+					fillImage: 'images/grass.jpg',
+					fillImageSize: [64, 64],
+					outlineWidth: 3,
+					lineHighlightWiden: 1,
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+
+			var x, y, r, g;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 28e6;
+				y = -2e7 + 4e7 * i / iLen;
+				r = 1e6 + 1e6 * i / iLen;
+				g = new G.Graphic.Circle([x, y, r], null, {
+					fillImage: 'images/honey.png',
+					fillImageSize: [128, 128],
+					fillOpacity: 1.0,
+					outlineWidth: 8,
+					lineHighlightWiden: 1,
+					clickable: true
+				});
+				g.addTo(graphicLayer);
+			}
+
+			var x, y, r, g;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 32e6;
+				y = -2e7 + 4e7 * i / iLen;
+				r = 1e6 + 1e6 * i / iLen;
+				g = new G.Graphic.Circle([x, y, r], null, {
+					outline: false,
+					fillColor: '#f00',
+					fillOpacity: 0,
+					gradual: true
+				});
+				g.addTo(graphicLayer);
+			}
+
+			var x, y, g, g0, g1, g2;
+			for (var i = 0, iLen = 10; i <= iLen; i++) {
+				x = -2e7 + 36e6;
+				y = -2e7 + 4e7 * i / iLen;
+				g0 = new G.Graphic.Point([x, y], null, {
+					shape: 'circle',
+					size: [48],
+					fillColor: '#0f0',
+					fillOpacity: 0.5,
+					lineHighlightWiden: 3
+				});
+				g1 = new G.Graphic.Point([x, y], null, {
+					shape: 'circle',
+					size: [32],
+					fillColor: '#000',
+					fillOpacity: 0.8
+				});
+				g2 = new G.Graphic.Point([x, y], null, {
+					shape: 'text',
+					size: [16],
+					fillColor: '#fff',
+					text: i
+				});	
+
+				g = new G.Graphic.Group([g0, g1, g2], null, {
+						clickable: false
+					});
+				g.addTo(graphicLayer);
+			}
+
+			g = new G.Graphic.Arrow([[0, -5e6], [0, 5e6]], null, {
+				tailSize: 0,
+				fillColor: '#f00',
+				fillOpacity: 0.8,
+				outline: false,
+				clickable: true
+			});
+			g.addTo(graphicLayer);
+		});
+
+
+
+		function onGraphicClicked(e) {
+			var g = e.graphic;
+
+			if (g.isEditing()) {
+				g.endEdit();
+			} else {
+				g.startEdit();
+			}
+			
+			g.bringToTop();
+		}
+
+		function onGraphicOver(e) {
+			var g = e.graphic;
+		}
+
+		function onGraphicOut(e) {
+			var g = e.graphic;
+
+		}
+
+	</script>
+	
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../3rd/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="../lib/g.css">
+<link rel="stylesheet" href="../3rd/powerange/powerange.min.css" />
+<script src="../3rd/powerange/powerange.min.js"></script>
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="./data/world-countries.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+	<div style="z-index: 1; position: absolute; top: 0px; padding: 10px;">
+		<span class="badge" style="background-color:#f00; opacity: 0.5;"> 人口 &gt 10亿 </span>
+		<br>
+		<span class="badge" style="background-color:#f90; opacity: 0.5;"> 人口 &gt 1亿 </span>
+		<br>
+		<span class="badge" style="background-color:#090; opacity: 0.5;"> 人口 &gt 1000万 </span>
+		<br>
+		<span class="badge" style="background-color:#000; opacity: 0.5;"> 人口 &lt 1000万 </span>
+		<br>
+
+		<br><br><br><br>
+		<div>
+            <input type="text" id="gdp-range" />
+        </div>
+        <h3><span class="label label-default"> GDP &gt <span id="gdp-num">0千万</span> $</span></h3>
+	</div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer;
+
+		var gdpInput = document.querySelector('#gdp-range');
+		var gdpRange = new Powerange(gdpInput, {
+			min: 0,
+			max: 8e6,
+			hideRange: true,
+			callback: function() {
+
+				var gdp = gdpInput.value;
+
+				var text;
+				if(gdp<100){
+					text = parseInt(gdp/10) + '千万';
+				}else if(gdp<1000){
+					text = parseInt(gdp/100) + '亿';
+				}else if(gdp<1e4){
+					text = parseInt(gdp/1e3) + '十亿';
+				}else if(gdp<1e5){
+					text = parseInt(gdp/1e4) + '百亿';
+				}else if(gdp<1e6){
+					text = parseInt(gdp/1e5) + '千亿';
+				}else{
+					text = parseInt(gdp/1e6) + '万亿';
+				}
+				document.querySelector('#gdp-num').innerHTML = text;
+				
+
+				if(graphicLayer){
+					graphicLayer.clearStyles();
+
+					graphicLayer.setStyle(['gdp'], ['<' + gdp], {
+						fillOpacity: 0.1
+					});
+
+					graphicLayer.setStyle(['gdp'], ['>=' + gdp], {
+						fillOpacity: 0.5
+					});
+				}
+
+			}
+		});
+
+		G.ready(function() {
+			map = new G.Map('mapContainer', {
+				wrap: false,
+				originX: -180,
+				originY: 90,
+				minX: -180,
+				maxX: 180,
+				minY: -90,
+				maxY: 90,
+				minRes: 0.00000536441802978515,
+				maxRes: 0.3515625,
+				initStatus: {
+					center: [0, 0],
+					res: 0.3515625,
+					rotate: 0
+				}
+			});
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			graphicLayer.setStyle(['pop'], ['>1e9'], {
+				fillColor: '#f00',
+				fillOpacity: 0.5
+			}).setStyle(['pop'], ['>1e8'], {
+				fillColor: '#f90',
+				fillOpacity: 0.5
+			}).setStyle(['pop'], ['>1e7'], {
+				fillColor: '#090',
+				fillOpacity: 0.5
+			}).setStyle(['pop'], ['<=1e7'], {
+				fillColor: '#000',
+				fillOpacity: 0.5
+			});
+
+			graphicLayer.addListener('graphicClicked', function(e){
+				var g = e.graphic;
+
+				var labelPoint = g.attrs['label_point'];
+				var name = g.attrs.name;
+				var pop = parseInt(g.attrs.pop/1e4);
+				var gdp = g.attrs.gdp/100;
+
+				var text = name + '<span class="badge">人口数量: ' + pop + '万<br>GDP: ' + gdp + '亿美元</span>';
+				if(labelPoint){
+					map.showPopup(labelPoint, text);
+				}
+			});
+
+			var graphicOptions = {
+				outlineColor: '#fff',
+				outlineWidth: 1,
+				lineHighlightWiden: 1,
+				clickable: true
+			};
+
+			var country, countryId, countryData, geom, g;
+			var partKey, partGeom;
+			for (var i = G.data.WorldCountries.length - 1; i >= 0; i--) {
+				country = G.data.WorldCountries[i];
+				geom = country.geom;
+				countryId = country.attrs.id;
+
+				countryData = data[countryId];
+				if(countryData){
+					country.attrs.pop = countryData['pop'];
+					country.attrs.gdp = countryData['gdp'];
+				}
+
+				if(!country.geom.m){
+					g = new G.Graphic.Polygon(geom, country.attrs, graphicOptions);
+					g.addTo(graphicLayer);
+				}else{
+					for (partKey in geom.m) {
+						partGeom = geom.m[partKey];
+						
+						g = new G.Graphic.Polygon(partGeom, country.attrs, graphicOptions);
+						g.addTo(graphicLayer);
+					}
+				}
+			}
+
+
+		});
+
+
+		var data = {
+			"AFG": {
+				"pop": 28400000,
+				"gdp": 22270
+			},
+			"AGO": {
+				"pop": 12799293,
+				"gdp": 110300
+			},
+			"ALB": {
+				"pop": 3639453,
+				"gdp": 21810
+			},
+			"AND": {
+				"pop": 83888,
+				"gdp": 3660
+			},
+			"ARE": {
+				"pop": 4798491,
+				"gdp": 184300
+			},
+			"ARG": {
+				"pop": 40913584,
+				"gdp": 573900
+			},
+			"ARM": {
+				"pop": 2967004,
+				"gdp": 18770
+			},
+			"ATG": {
+				"pop": 85632,
+				"gdp": 1657
+			},
+			"AUS": {
+				"pop": 21266657,
+				"gdp": 799966
+			},
+			"AUT": {
+				"pop": 8210281,
+				"gdp": 329500
+			},
+			"AZE": {
+				"pop": 8238672,
+				"gdp": 77610
+			},
+			"BDI": {
+				"pop": 8988091,
+				"gdp": 3102
+			},
+			"BEL": {
+				"pop": 10414336,
+				"gdp": 389300
+			},
+			"BEN": {
+				"pop": 8791832,
+				"gdp": 12830
+			},
+			"BFA": {
+				"pop": 15746232,
+				"gdp": 17820
+			},
+			"BGD": {
+				"pop": 156050883,
+				"gdp": 224000
+			},
+			"BGR": {
+				"pop": 7204687,
+				"gdp": 93750
+			},
+			"BHR": {
+				"pop": 727785,
+				"gdp": 26820
+			},
+			"BHS": {
+				"pop": 309156,
+				"gdp": 9093
+			},
+			"BIH": {
+				"pop": 4613414,
+				"gdp": 29700
+			},
+			"BLR": {
+				"pop": 9648533,
+				"gdp": 114100
+			},
+			"BLZ": {
+				"pop": 307899,
+				"gdp": 2536
+			},
+			"BOL": {
+				"pop": 9775246,
+				"gdp": 43270
+			},
+			"BRA": {
+				"pop": 198739269,
+				"gdp": 1993000
+			},
+			"BRB": {
+				"pop": 284589,
+				"gdp": 5425
+			},
+			"BRN": {
+				"pop": 388190,
+				"gdp": 20250
+			},
+			"BTN": {
+				"pop": 691141,
+				"gdp": 3524
+			},
+			"BWA": {
+				"pop": 1990876,
+				"gdp": 27060
+			},
+			"CAF": {
+				"pop": 4511488,
+				"gdp": 3198
+			},
+			"CAN": {
+				"pop": 33487208,
+				"gdp": 1300000
+			},
+			"CHN": {
+				"pop": 1346234010,
+				"gdp": 7972802
+			},
+			"CHE": {
+				"pop": 7604467,
+				"gdp": 316700
+			},
+			"CHL": {
+				"pop": 16601707,
+				"gdp": 244500
+			},
+			"CIV": {
+				"pop": 20617068,
+				"gdp": 33850
+			},
+			"CMR": {
+				"pop": 18879301,
+				"gdp": 42750
+			},
+			"CYP": {
+				"pop": 10000,
+				"gdp": 280
+			},
+			"COD": {
+				"pop": 68692542,
+				"gdp": 20640
+			},
+			"COG": {
+				"pop": 4012809,
+				"gdp": 15350
+			},
+			"COL": {
+				"pop": 45644023,
+				"gdp": 395400
+			},
+			"COM": {
+				"pop": 752438,
+				"gdp": 751
+			},
+			"CPV": {
+				"pop": 429474,
+				"gdp": 1626
+			},
+			"CRI": {
+				"pop": 4253877,
+				"gdp": 48320
+			},
+			"CUB": {
+				"pop": 11451652,
+				"gdp": 108200
+			},
+			"CYP": {
+				"pop": 265100,
+				"gdp": 3600
+			},
+			"CYP": {
+				"pop": 531640,
+				"gdp": 22700
+			},
+			"CZE": {
+				"pop": 10211904,
+				"gdp": 265200
+			},
+			"DEU": {
+				"pop": 82329758,
+				"gdp": 2918000
+			},
+			"DJI": {
+				"pop": 516055,
+				"gdp": 1885
+			},
+			"DMA": {
+				"pop": 72660,
+				"gdp": 720
+			},
+			"DNK": {
+				"pop": 5606966,
+				"gdp": 205700
+			},
+			"DOM": {
+				"pop": 9650054,
+				"gdp": 78000
+			},
+			"DZA": {
+				"pop": 34178188,
+				"gdp": 232900
+			},
+			"ECU": {
+				"pop": 14573101,
+				"gdp": 107700
+			},
+			"EGY": {
+				"pop": 83082869,
+				"gdp": 443700
+			},
+			"ERI": {
+				"pop": 5647168,
+				"gdp": 3945
+			},
+			"ESP": {
+				"pop": 40525002,
+				"gdp": 1403000
+			},
+			"EST": {
+				"pop": 1299371,
+				"gdp": 27410
+			},
+			"ETH": {
+				"pop": 85237338,
+				"gdp": 68770
+			},
+			"FIN": {
+				"pop": 5277428,
+				"gdp": 195063
+			},
+			"FJI": {
+				"pop": 944720,
+				"gdp": 3579
+			},
+			"FRA": {
+				"pop": 64638750,
+				"gdp": 2136605
+			},
+			"FSM": {
+				"pop": 107434,
+				"gdp": 238
+			},
+			"GAB": {
+				"pop": 1514993,
+				"gdp": 21110
+			},
+			"GBR": {
+				"pop": 62741198,
+				"gdp": 1997889
+			},
+			"GEO": {
+				"pop": 4615807,
+				"gdp": 21510
+			},
+			"GHA": {
+				"pop": 23832495,
+				"gdp": 34200
+			},
+			"GIN": {
+				"pop": 10057975,
+				"gdp": 10600
+			},
+			"GMB": {
+				"pop": 1782893,
+				"gdp": 2272
+			},
+			"GNB": {
+				"pop": 1533964,
+				"gdp": 904
+			},
+			"GNQ": {
+				"pop": 650702,
+				"gdp": 14060
+			},
+			"GRC": {
+				"pop": 10737428,
+				"gdp": 343000
+			},
+			"GRD": {
+				"pop": 90739,
+				"gdp": 1161
+			},
+			"GTM": {
+				"pop": 13276517,
+				"gdp": 68580
+			},
+			"GUY": {
+				"pop": 772298,
+				"gdp": 2966
+			},
+			"HND": {
+				"pop": 7792854,
+				"gdp": 33720
+			},
+			"HRV": {
+				"pop": 4489409,
+				"gdp": 82390
+			},
+			"HTI": {
+				"pop": 9035536,
+				"gdp": 11500
+			},
+			"HUN": {
+				"pop": 9905596,
+				"gdp": 196600
+			},
+			"IDN": {
+				"pop": 240271522,
+				"gdp": 914600
+			},
+			"IND": {
+				"pop": 1166079220,
+				"gdp": 3297000
+			},
+			"IRL": {
+				"pop": 4203200,
+				"gdp": 188400
+			},
+			"IRN": {
+				"pop": 66429284,
+				"gdp": 841700
+			},
+			"IRQ": {
+				"pop": 31129225,
+				"gdp": 103900
+			},
+			"ISL": {
+				"pop": 306694,
+				"gdp": 12710
+			},
+			"ISR": {
+				"pop": 7233701,
+				"gdp": 201400
+			},
+			"ITA": {
+				"pop": 58126212,
+				"gdp": 1823000
+			},
+			"JAM": {
+				"pop": 2825928,
+				"gdp": 20910
+			},
+			"JOR": {
+				"pop": 6342948,
+				"gdp": 31610
+			},
+			"JPN": {
+				"pop": 127078679,
+				"gdp": 4329000
+			},
+			"KAZ": {
+				"pop": 15399437,
+				"gdp": 175800
+			},
+			"KEN": {
+				"pop": 39002772,
+				"gdp": 61510
+			},
+			"KGZ": {
+				"pop": 5431747,
+				"gdp": 11610
+			},
+			"KHM": {
+				"pop": 14494293,
+				"gdp": 27940
+			},
+			"KIR": {
+				"pop": 112850,
+				"gdp": 580
+			},
+			"KNA": {
+				"pop": 40131,
+				"gdp": 778
+			},
+			"KOR": {
+				"pop": 48508972,
+				"gdp": 1335000
+			},
+			"SRB": {
+				"pop": 1804838,
+				"gdp": 5352
+			},
+			"KWT": {
+				"pop": 2691158,
+				"gdp": 149100
+			},
+			"LAO": {
+				"pop": 6834942,
+				"gdp": 13980
+			},
+			"LBN": {
+				"pop": 4017095,
+				"gdp": 44060
+			},
+			"LBR": {
+				"pop": 3441790,
+				"gdp": 1526
+			},
+			"LBY": {
+				"pop": 6310434,
+				"gdp": 88830
+			},
+			"LCA": {
+				"pop": 160267,
+				"gdp": 1778
+			},
+			"LIE": {
+				"pop": 34761,
+				"gdp": 4160
+			},
+			"LKA": {
+				"pop": 21324791,
+				"gdp": 91870
+			},
+			"LSO": {
+				"pop": 2130819,
+				"gdp": 3293
+			},
+			"LTU": {
+				"pop": 3555179,
+				"gdp": 63330
+			},
+			"LUX": {
+				"pop": 491775,
+				"gdp": 39370
+			},
+			"LVA": {
+				"pop": 2231503,
+				"gdp": 38860
+			},
+			"MAR": {
+				"pop": 34859364,
+				"gdp": 136600
+			},
+			"MCO": {
+				"pop": 32965,
+				"gdp": 976
+			},
+			"MDA": {
+				"pop": 4320748,
+				"gdp": 10670
+			},
+			"MDG": {
+				"pop": 20653556,
+				"gdp": 20130
+			},
+			"MDV": {
+				"pop": 396334,
+				"gdp": 1716
+			},
+			"MEX": {
+				"pop": 111211789,
+				"gdp": 1563000
+			},
+			"MHL": {
+				"pop": 64522,
+				"gdp": 134
+			},
+			"MKD": {
+				"pop": 2066718,
+				"gdp": 18780
+			},
+			"MLI": {
+				"pop": 12666987,
+				"gdp": 14590
+			},
+			"MLT": {
+				"pop": 405165,
+				"gdp": 9962
+			},
+			"MMR": {
+				"pop": 48137741,
+				"gdp": 55130
+			},
+			"MNE": {
+				"pop": 672180,
+				"gdp": 6816
+			},
+			"MNG": {
+				"pop": 3041142,
+				"gdp": 9476
+			},
+			"MOZ": {
+				"pop": 21669278,
+				"gdp": 18940
+			},
+			"MRT": {
+				"pop": 3129486,
+				"gdp": 6308
+			},
+			"MUS": {
+				"pop": 1284264,
+				"gdp": 15270
+			},
+			"MWI": {
+				"pop": 14268711,
+				"gdp": 11810
+			},
+			"MYS": {
+				"pop": 25715819,
+				"gdp": 384300
+			},
+			"NAM": {
+				"pop": 2108665,
+				"gdp": 13250
+			},
+			"NER": {
+				"pop": 15306252,
+				"gdp": 10040
+			},
+			"NGA": {
+				"pop": 149229090,
+				"gdp": 335400
+			},
+			"NIC": {
+				"pop": 5891199,
+				"gdp": 16790
+			},
+			"NLD": {
+				"pop": 16998259,
+				"gdp": 677496
+			},
+			"NOR": {
+				"pop": 4676305,
+				"gdp": 276400
+			},
+			"NPL": {
+				"pop": 28563377,
+				"gdp": 31080
+			},
+			"NRU": {
+				"pop": 14019,
+				"gdp": 60
+			},
+			"NZL": {
+				"pop": 4242593,
+				"gdp": 116559
+			},
+			"OMN": {
+				"pop": 3418085,
+				"gdp": 66980
+			},
+			"PAK": {
+				"pop": 176242949,
+				"gdp": 427300
+			},
+			"PAN": {
+				"pop": 3360474,
+				"gdp": 38830
+			},
+			"PER": {
+				"pop": 29546963,
+				"gdp": 247300
+			},
+			"PHL": {
+				"pop": 97976603,
+				"gdp": 317500
+			},
+			"PLW": {
+				"pop": 20796,
+				"gdp": 164
+			},
+			"PNG": {
+				"pop": 6057263,
+				"gdp": 13210
+			},
+			"POL": {
+				"pop": 38482919,
+				"gdp": 667900
+			},
+			"PRK": {
+				"pop": 22665345,
+				"gdp": 40000
+			},
+			"PRT": {
+				"pop": 10707924,
+				"gdp": 208627
+			},
+			"PRY": {
+				"pop": 6995655,
+				"gdp": 28890
+			},
+			"QAT": {
+				"pop": 833285,
+				"gdp": 91330
+			},
+			"ROU": {
+				"pop": 22215421,
+				"gdp": 271400
+			},
+			"RUS": {
+				"pop": 140041247,
+				"gdp": 2266000
+			},
+			"RWA": {
+				"pop": 10473282,
+				"gdp": 9706
+			},
+			"SAU": {
+				"pop": 28686633,
+				"gdp": 576500
+			},
+			"SDN": {
+				"pop": 25946220,
+				"gdp": 88080
+			},
+			"SSD": {
+				"pop": 10625176,
+				"gdp": 13227
+			},
+			"SEN": {
+				"pop": 13711597,
+				"gdp": 21980
+			},
+			"SGP": {
+				"pop": 4657542,
+				"gdp": 237300
+			},
+			"SLB": {
+				"pop": 595613,
+				"gdp": 1078
+			},
+			"SLE": {
+				"pop": 6440053,
+				"gdp": 4285
+			},
+			"SLV": {
+				"pop": 7185218,
+				"gdp": 43630
+			},
+			"SMR": {
+				"pop": 30324,
+				"gdp": 1662
+			},
+			"SOM": {
+				"pop": 3500000,
+				"gdp": 12250
+			},
+			"SOM": {
+				"pop": 9832017,
+				"gdp": 5524
+			},
+			"SRB": {
+				"pop": 7379339,
+				"gdp": 80340
+			},
+			"STP": {
+				"pop": 212679,
+				"gdp": 277
+			},
+			"SUR": {
+				"pop": 481267,
+				"gdp": 4254
+			},
+			"SVK": {
+				"pop": 5463046,
+				"gdp": 119500
+			},
+			"SVN": {
+				"pop": 2005692,
+				"gdp": 59340
+			},
+			"SWE": {
+				"pop": 9059651,
+				"gdp": 344300
+			},
+			"SWZ": {
+				"pop": 1123913,
+				"gdp": 5702
+			},
+			"SYC": {
+				"pop": 87476,
+				"gdp": 1715
+			},
+			"SYR": {
+				"pop": 20178485,
+				"gdp": 98830
+			},
+			"TCD": {
+				"pop": 10329208,
+				"gdp": 15860
+			},
+			"TGO": {
+				"pop": 6019877,
+				"gdp": 5118
+			},
+			"THA": {
+				"pop": 65905410,
+				"gdp": 547400
+			},
+			"TJK": {
+				"pop": 7349145,
+				"gdp": 13160
+			},
+			"TKM": {
+				"pop": 4884887,
+				"gdp": 29780
+			},
+			"TLS": {
+				"pop": 1131612,
+				"gdp": 2520
+			},
+			"TON": {
+				"pop": 120898,
+				"gdp": 549
+			},
+			"TTO": {
+				"pop": 1310000,
+				"gdp": 29010
+			},
+			"TUN": {
+				"pop": 10486339,
+				"gdp": 81710
+			},
+			"TUR": {
+				"pop": 76805524,
+				"gdp": 902700
+			},
+			"TUV": {
+				"pop": 12373,
+				"gdp": 15
+			},
+			"TWN": {
+				"pop": 22974347,
+				"gdp": 712000
+			},
+			"TZA": {
+				"pop": 41048532,
+				"gdp": 54250
+			},
+			"UGA": {
+				"pop": 32369558,
+				"gdp": 39380
+			},
+			"UKR": {
+				"pop": 45700395,
+				"gdp": 339800
+			},
+			"URY": {
+				"pop": 3494382,
+				"gdp": 43160
+			},
+			"USA": {
+				"pop": 318386466,
+				"gdp": 15169683
+			},
+			"UZB": {
+				"pop": 27606007,
+				"gdp": 71670
+			},
+			"VAT": {
+				"pop": 832,
+				"gdp": 355
+			},
+			"VCT": {
+				"pop": 104574,
+				"gdp": 1070
+			},
+			"VEN": {
+				"pop": 26814843,
+				"gdp": 357400
+			},
+			"VNM": {
+				"pop": 86967524,
+				"gdp": 241700
+			},
+			"VUT": {
+				"pop": 218519,
+				"gdp": 989
+			},
+			"WSM": {
+				"pop": 219998,
+				"gdp": 1049
+			},
+			"YEM": {
+				"pop": 23822783,
+				"gdp": 55280
+			},
+			"ZAF": {
+				"pop": 49052489,
+				"gdp": 491000
+			},
+			"ZMB": {
+				"pop": 11862740,
+				"gdp": 17500
+			},
+			"ZWE": {
+				"pop": 12619600,
+				"gdp": 9323
+			},
+			"ATA": {
+				"pop": 3802,
+				"gdp": 760
+			}
+		};
+
+
+
+	</script>
+	
+</body>
+</html>

@@ -1,0 +1,11 @@
+<mall id="10100101" name="BaiShengGouWuZhongXin (TaiYangGongDian )" floorcount="8">
+	<floor id="101001010001" string="B1" />
+	<floor id="101001010002" string="F1" />
+	<floor id="101001010003" string="F2" />
+	<floor id="101001010004" string="F3" />
+	<floor id="101001010005" string="F4" />
+	<floor id="101001010006" string="F5" />
+	<floor id="101001010007" string="F6" />
+	<floor id="101001010008" string="F7" />
+	<gps></gps>
+</mall>

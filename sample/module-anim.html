@@ -1,0 +1,162 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer, g, fromG, toG;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer');
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+			tileLayer.addTo(map);
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			G.loadModule('anim', function() {
+				g = new G.Graphic.AnimPoint(
+						new G.Graphic.Point([-2e7, 1e7]), 
+						new G.Graphic.Point([-1e7, 1e7]), 
+						{
+							duration: 4,
+							repeatCount: 2
+						}
+					);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimPoint(
+						new G.Graphic.Point([1e7, 1e7], null, {
+							size:[0, 0],
+							fillOpacity: 0,
+							fillColor: '#ff0',
+							gradual: true
+						}), 
+						new G.Graphic.Point([1e7, 1e7], null, {
+							size:[24, 24],
+							fillOpacity: 0,
+							fillColor: '#f00',
+							gradual: true
+						})
+					);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimPoint(
+						new G.Graphic.Point([0, 1e7], null, {
+							shape: 'image',
+					        size: [25, 40],
+					        offset: [-12, -40],
+							image: '../lib/images/pin{i}.png',
+					        imageRotate: 0
+						}), 
+						new G.Graphic.Point([0, 1e7], null, {
+							shape: 'image',
+					        size: [25, 40],
+					        offset: [-12, -40],
+							image: '../lib/images/pin{i}.png',
+					        imageRotate: 360
+						})
+					);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimPolyline(
+					new G.Graphic.Polyline([
+						[-2e7, 0],
+						[-1e7, 0]
+					]),
+					new G.Graphic.Polyline([
+						[-2e7, 0],
+						[-2e7, -1e7]
+					])
+				);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimPolyline(
+					new G.Graphic.Polyline([
+						[-1e7, 0],
+						[-1e7, 0],
+						[0, 0]
+					], null, {
+						lineWidth: 10,
+						lineDashArray: [20, 10],
+						lineColor: '#00f'
+					}),
+					new G.Graphic.Polyline([
+						[-1e7, -1e7],
+						[-1e7, 0],
+						[0, 0]
+					], null, {
+						lineWidth: 2,
+						lineDashArray: [50, 10],
+						lineColor: '#09f'
+					})
+				);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimPolygon(
+					new G.Graphic.Polygon([[
+						[1e7, -0.5e7 ],
+						[1e7, -0.5e7 ],
+						[1.5e7, -1.5e7 ],
+						[1.5e7, -1.5e7 ],
+						[0.5e7, -1.5e7 ]
+					]], null, {
+					}),
+					new G.Graphic.Polygon([[
+						[-0.5e7, -0.5e7 ],
+						[1.5e7, -0.5e7 ],
+						[2e7, -1e7 ],
+						[1e7, -2e7 ],
+						[0, -1e7 ]
+					]], null, {
+						fillOpacity: 1,
+						fillColor: '#0f0',
+						outlineColor: '#ff0'
+					}),{
+						duration: 5,
+						repeatCount: 1
+					}
+				);
+				g.addTo(graphicLayer);
+				g.play();
+
+				g = new G.Graphic.AnimCircle(
+					new G.Graphic.Circle([1e7, 0, 0], null, {
+					outline: false,
+					fillColor: '#0f0',
+					fillOpacity: 0,
+					gradual: true
+				}),
+					new G.Graphic.Circle([1e7, 0, 2e6], null, {
+					fillOpacity: 0,
+					fillColor: '#f00'
+				})
+				);
+				g.addTo(graphicLayer);
+				g.play();
+
+
+			});
+
+		});
+
+	</script>
+	
+</body>
+</html>

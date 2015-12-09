@@ -1,0 +1,4173 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../3rd/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="syntax.css">
+<link rel="stylesheet" href="main.css">
+<link rel="shortcut icon" href="favicon.ico" />
+<title>GeoHey JavaScript SDK</title>
+<script src="../3rd/jquery.min.js"></script>
+<script src="../3rd/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('label.tree-toggler').click(function() {
+            $(this).parent().children('ul.tree').toggle(300);
+        });
+
+        //$('ul.tree').toggle();
+    });
+</script>
+</head>
+
+<body>
+    <h1 id="title">
+        <div class="logo"></div> JavaScript SDK <small id="version"></small>
+    </h1>
+
+    <hr>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-list">
+                	<li><a href="#summary"><span class="glyphicon glyphicon-home"></span> 概述</a></li>
+                    <li>
+                        <label class="tree-toggler nav-header"><span class="glyphicon glyphicon-send"></span> 入门指南</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="#guide-init">引入SDK并显示地图</a></li>
+                            <li><a href="#guide-cloud">云端使用</a></li>
+                            <li><a href="#guide-concept">基本概念</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <label class="tree-toggler nav-header"><span class="glyphicon glyphicon-book"></span> API参考</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="#map">地图 (Map)</a></li>
+                            <li>
+                                <label class="tree-toggler nav-header">图层 (Layer)</label>
+                                <ul class="nav nav-list tree">
+									<li><a href="#layer">Layer抽象类</a></li>
+									<li><a href="#tile-layer">Layer.Tile</a></li>
+									<li><a href="#graphic-layer">Layer.Graphic</a></li>
+									<li><a href="#html-layer">Layer.Html</a></li>
+                                    <li><a href="#image-layer">Layer.Image</a></li>
+									<li><a href="#feature-service-layer">Layer.FeatureService</a></li>
+                                    <li><a href="#geohey-feature-layer">Layer.GeoHeyFeature</a></li>
+									<li><a href="#label-layer">Layer.Label</a></li>
+                                    <li><a href="#tiled-service-layer">Layer.TiledService</a></li>
+									<li><a href="#vector-cache-layer">Layer.VectorCache</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <label class="tree-toggler nav-header">图形对象 (Graphic)</label>
+                                <ul class="nav nav-list tree">
+									<li><a href="#graphic">Graphic抽象类</a></li>
+									<li><a href="#point-graphic">点</a></li>
+									<li><a href="#polyline-graphic">线</a></li>
+									<li><a href="#polygon-graphic">面</a></li>
+									<li><a href="#circle-graphic">圆</a></li>
+                                    <li><a href="#arrow-graphic">箭头</a></li>
+									<li><a href="#group-graphic">组合图形</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <label class="tree-toggler nav-header">事件 (Event)</label>
+                                <ul class="nav nav-list tree">
+									<li><a href="#event-listener">事件的监听</a></li>
+									<li><a href="#event-format">事件格式</a></li>
+									<li><a href="#event-list">事件列表</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <label class="tree-toggler nav-header">投影 (Project)</label>
+                                <ul class="nav nav-list tree">
+									<li><a href="#project-wm">常见的互联网地图投影Web Mercator</a></li>
+									<li><a href="#project-gcj">中国特殊的偏移投影</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <label class="tree-toggler nav-header">其它杂项</label>
+                                <ul class="nav nav-list tree">
+									<li><a href="#misc-ajax">AJAX请求</a></li>
+									<li><a href="#misc-str">字符串处理</a></li>
+									<li><a href="#misc-obj">对象处理</a></li>
+									<li><a href="#misc-color">颜色处理</a></li>
+                                    <li><a href="#misc-geom">几何对象工具</a></li>
+									<li><a href="#misc-extent">地图范围工具</a></li>
+									<li><a href="#misc-measure">经纬度测量工具</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <label class="tree-toggler nav-header">扩展模块</label>
+                                <ul class="nav nav-list tree">
+                                    <li><a href="#module-anim">动画</a></li>
+									<li><a href="#module-maps">底图服务</a></li>
+									<li><a href="#module-draw">交互绘图</a></li>
+									<li><a href="#module-cluster">聚类图</a></li>
+									<li><a href="#module-arcgis">ArcGIS</a></li>
+									<li><a href="#module-heat">热度图</a></li>
+									<li><a href="#module-movable">动态目标</a></li>
+                                    <li><a href="#module-geogrid">地理网格</a></li>
+                                    <li><a href="#module-fluid">流体场动画</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <label class="tree-toggler nav-header"><span class="glyphicon glyphicon-glyphicon glyphicon-tree-deciduous"></span> 示例</label>
+                        <ul class="nav nav-list tree">
+                            <li><a href="../sample/simple-map.html" target="_blank">简单地图</a></li>
+                            <li><a href="../sample/print.html" target="_blank">打印地图</a></li>
+                            <li><a href="../sample/world-pop-gdp.html" target="_blank">世界人口与GDP</a></li>
+                            <li><a href="../sample/china-admin.html" target="_blank">中国行政区划</a></li>
+                            <li><a href="../sample/indoor-map.html" target="_blank">室内地图</a></li>
+                            <li><a href="../sample/popup.html" target="_blank">弹出气泡</a></li>
+                            <li><a href="../sample/edit-china-boundary.html" target="_blank">编辑中国国界线</a></li>
+                            <li><a href="../sample/graphic-layer.html" target="_blank">各种图形的显示及编辑</a></li>
+                            <li><a href="../sample/module-draw.html" target="_blank">在地图上绘制</a></li>
+                            <li><a href="../sample/module-arcgis.html" target="_blank">接入ArcGIS要素服务</a></li>
+                            <li><a href="../sample/10k-points.html" target="_blank">10K个点</a></li>
+                            <li><a href="../sample/mask.html" target="_blank">地图遮罩</a></li>
+                            <li><a href="../sample/pie-chart-map.html" target="_blank">浏览器份额地图（饼图）</a></li>
+                            <li><a href="../sample/wind.html" target="_blank">全球风场</a></li>
+                            <li><a href="../sample/module-cluster.html" target="_blank">聚类图</a></li>
+                            <li><a href="../sample/module-heat.html" target="_blank">热度图</a></li>
+                            <li><a href="../sample/module-maps.html" target="_blank">第三方在线地图</a></li>
+                            <li><a href="../sample/module-anim.html" target="_blank">动画图形</a></li>
+                            <li><a href="../sample/movable-point.html" target="_blank">移动目标</a></li>
+                            <li><a href="../sample/module-geogrid.html" target="_blank">地理网格</a></li>
+                            <li><a href="../sample/world-flash.html" target="_blank">闪烁的世界（试验功能）</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-sm-8 col-md-9"><h2 id="download">SDK下载</h2>
+<p>当前版本下载链接：<a id="link-sdk" href="javascript:;" target="_blank">加载中&hellip;</a></p>
+<p><br></p>
+<h2 id="summary">概述</h2>
+<p>GeoHey JavaScript SDK是一个面向移动互联网时代，遵循移动优先、向下兼容、保持轻量原则的地图SDK。</p>
+<p>除了一般地图SDK所有的功能，GeoHey JavaScript SDK还具有以下特性：</p>
+<p><small></p>
+<blockquote>
+<p>针对视网膜屏的兼容和优化</p>
+<p>与微信等轻应用平台无缝融合</p>
+<p>地图支持无极缩放</p>
+<p>地图支持旋转</p>
+<p>支持大数据量的显示</p>
+<p>地图上可添加图表、视频等任意内容</p>
+<p>提供第三方地图服务集成、聚类、热图、动态目标等多种扩展模块</p>
+</blockquote>
+<p></small></p>
+<p>目前，SDK支持Chrome、Firefox、Safari、IE(7+)、Android等PC和移动端浏览器，SDK会根据情况自动选择 HTML5 CANVAS、SVG、VML甚至是WebGL等技术来进行显示。</p>
+<p><br>
+<br>
+<br></p>
+<h2 id="guide">入门指南</h2>
+<h3 id="guide-init">引入SDK并显示地图</h3>
+<p>将下载的SDK包中的lib目录下<strong>所有</strong>的文件与文件夹部署到服务器上，并在HTML文件中引入必需的文件链接：</p>
+<div class="codehilite"><pre><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;g.css&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;g.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+
+<blockquote>
+<p>注意，虽然在HTML页面中只直接引用了&rsquo;g.min.js&rsquo;，但必须保证服务器上存在&rsquo;g-canvas.min.js&rsquo;、&rsquo;g-svg.min.js&rsquo;、&rsquo;g-vml.min.js&rsquo;、&rsquo;g-webgl.min.js&rsquo;，客户端会根据不同浏览器加载这几个渲染实现之一，这样的设计有助于保证浏览器下载库文件的体积，提升用户体验。</p>
+</blockquote>
+<p>在HTML中合适的位置加入一个显示地图的div：</p>
+<div class="codehilite"><pre><span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mapContainer&quot;</span> <span class="na">style=</span><span class="s">&quot;width: 100%; height: 100%;&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+</pre></div>
+
+
+<p>在所有必要库文件加载完成后创建Map对象并进行后续的操作：</p>
+<div class="codehilite"><pre><span class="nx">G</span><span class="p">.</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// 此时类库加载完成</span>
+
+    <span class="kd">var</span> <span class="nx">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Map</span><span class="p">(</span><span class="s1">&#39;mapContainer&#39;</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">tileLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Tile</span><span class="p">(</span><span class="s1">&#39;http://{s}.tile.osm.org/{z}/{x}/{y}.png&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">cluster</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span>
+    <span class="p">});</span>
+    <span class="nx">tileLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="p">});</span>
+</pre></div>
+
+
+<p>您还有可能需要修改g.css中一些图片的URL路径以符合个性化的需求。</p>
+<h3 id="guide-cloud">云端使用</h3>
+<p>您也可以在页面中直接引用在线库文件，而无需下载开发包</p>
+<div class="codehilite"><pre><span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;http://dist.geohey.com/g-js/latest/lib/g.css&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;http://dist.geohey.com/g-js/latest/lib/g.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+
+<blockquote>
+<p>其中URL中的&rdquo;latest&rdquo;也可替换为指定的版本号，默认加载最新版本。</p>
+</blockquote>
+<h3 id="guide-concept">基本概念</h3>
+<p><strong>命名空间</strong></p>
+<p>SDK库使用命名空间“G”，请避免使用这个名称作其它用途，否则类库可能无法正常工作。另外，在“g.css”中定义了若干名为&rsquo;g-xxx&rsquo;的CSS样式，请确保其它自定义样式不与之冲突。</p>
+<p><strong>版本</strong></p>
+<p>通过命名空间下的version对象可以查看当前版本。</p>
+<div class="codehilite"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">G</span><span class="p">.</span><span class="nx">version</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong>全局参数</strong></p>
+<p>在加载SDK前，可以定义一些全局参数来进行特殊的控制，定义方式如下：</p>
+<div class="codehilite"><pre><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+    <span class="nx">G_OFF_CANVAS</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+<span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;g.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+
+<p>可用的全局参数包括：</p>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>参数类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G_OFF_CANVAS</td>
+<td>Boolean</td>
+<td>不使用 HTML5 Canvas 进行显示，对于大多数情况应该避免使用该参数</td>
+</tr>
+<tr>
+<td>G_OFF_CANVAS_OFFSCREEN</td>
+<td>Boolean</td>
+<td>关闭 HTML5 Canvas 的离屏渲染特性，对于大多数情况应该避免使用该参数</td>
+</tr>
+<tr>
+<td>G_OFF_CSS3D</td>
+<td>Boolean</td>
+<td>关闭 HTML5 中的CSS 3D 变换功能（大多数Canvas的3D变换会使用硬件加速），对于大多数情况应该避免使用该参数</td>
+</tr>
+<tr>
+<td>G_CANVAS_RATIO</td>
+<td>Boolean</td>
+<td>强制指定HTML5 Canvas的像素比例，对于超高分屏为了性能可能需要强制指定较低的像素比例</td>
+</tr>
+<tr>
+<td>G_ON_WEBGL</td>
+<td>Boolean</td>
+<td>开启 HTML5 的 WebGL 渲染功能，WebGL在渲染大数据量的时候有明显优势，但有些图形效果会缺失，目前WebGL模式仅供测试</td>
+</tr>
+<tr>
+<td>G_NOT_SET_VIEWPORT</td>
+<td>Boolean</td>
+<td>阻止类库修改viewport设置，默认情况下类库会帮助设置页面使其适合在移动设备上显示</td>
+</tr>
+</tbody>
+</table>
+<p><strong>模块</strong></p>
+<p>SDK可以根据需要加载模块，比如想要加载第三方地图，可以动态加载一个名为“maps”的模块，该模块中包含对各种第三方地图的集成。您也可以根据需要开发自己的模块。</p>
+<div class="codehilite"><pre><span class="nx">G</span><span class="p">.</span><span class="nx">loadModule</span><span class="p">(</span><span class="s1">&#39;maps&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// 开始使用模块内的功能</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>你也可以同时加载多个模块，确保所有的模块均加载成功后再进行下一步操作。</p>
+<div class="codehilite"><pre><span class="nx">G</span><span class="p">.</span><span class="nx">loadModules</span><span class="p">([</span><span class="s1">&#39;maps&#39;</span><span class="p">,</span> <span class="s1">&#39;draw&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// 开始使用模块内的功能</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<blockquote>
+<p>部署在服务器端的模块只有在调用loadModule方法的时候才会去请求.</p>
+</blockquote>
+<p><a href="#module">点击这里</a> 可以查看所有可用的模块</p>
+<p><strong>效果</strong></p>
+<p>除非有特殊的设置，如在全局参数中使用G_OFF_CANVAS设置关闭HTML5 Canvas功能等，否则浏览器会自动选择最佳效果进行显示。例如Chrome等现代浏览器会选择Canvas或SVG进行图形渲染；IE7/8则会选择VML等。不同的绘制方法不影响API的调用，但是某些特殊效果（如缩放动画）在低版本的浏览器中会自动退化（如IE7/8）。</p>
+<p><strong>几何对象</strong></p>
+<p>SDK内部使用尽量简单的几何对象描述，如下表所列:</p>
+<table>
+<thead>
+<tr>
+<th>几何对象类型</th>
+<th>格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td id="geometry">Geometry </td>
+<td></td>
+</tr>
+<tr>
+<td id="point">Point </td>
+<td>[ x, y ]</td>
+</tr>
+<tr>
+<td id="polyline">Polyline </td>
+<td>[ [x1, y1], &hellip;, [xn, yn] ]</td>
+</tr>
+<tr>
+<td id="polygon">Polygon </td>
+<td>[ [[x1, y1], &hellip;, [xn, yn]], &hellip; ]</td>
+</tr>
+<tr>
+<td id="extent">Extent </td>
+<td>[ xmin, ymin, xmax, ymax ]</td>
+</tr>
+<tr>
+<td id="circle">Circle </td>
+<td>[ cx, cy, r ]</td>
+</tr>
+</tbody>
+</table>
+<p><strong>地图分辨率</strong></p>
+<p>分辨率 (Resolution，API中简写为res) = 地图表示的实际尺寸 / 屏幕显示的像素尺寸</p>
+<p>分辨率越小，地图越详细。</p>
+<p><br>
+<br>
+<br></p>
+<h2 id="map">Map</h2>
+<blockquote>
+<p>Map是API的核心类，用于所有数据的显示和操作。</p>
+</blockquote>
+<h3 id="map-usage">示例</h3>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Map</span><span class="p">(</span><span class="s1">&#39;mapContainer&#39;</span><span class="p">,{</span>
+    <span class="nx">maxRes</span><span class="o">:</span> <span class="mi">160000</span><span class="p">,</span>
+    <span class="nx">minRes</span><span class="o">:</span> <span class="mf">19.109257</span><span class="p">,</span>
+    <span class="nx">initStatus</span><span class="o">:</span> <span class="p">{</span><span class="nx">center</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<h3 id="map-construct">构造</h3>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Map( [String] id, [Object] options )</td>
+<td>基于一个给定的div容器创建Map对象，options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong>构造选项</strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>minRes</td>
+<td>Number</td>
+<td>0.298582</td>
+<td>地图的最小分辨率，对应放大到最详细的状态</td>
+</tr>
+<tr>
+<td>maxRes</td>
+<td>Number</td>
+<td>156543.033928</td>
+<td>地图的最大分辨率，对应缩小到最全图的状态</td>
+</tr>
+<tr>
+<td>maxExtent</td>
+<td><a href="#extent">Extent</a></td>
+<td>[-20037508.342784, -20037508.342784, 20037508.342784, 20037508.342784]</td>
+<td>地图的最大范围，超出范围的数据将不会被显示，同时，对地图进行拖动也会限制在这个范围之内</td>
+</tr>
+<tr>
+<td>scrollPage</td>
+<td>Boolean</td>
+<td>false</td>
+<td>是否允许鼠标滚动页面，默认在地图上滚动鼠标不会滚动页面而是缩放地图</td>
+</tr>
+<tr>
+<td>zoomAnim</td>
+<td>Boolean</td>
+<td>true</td>
+<td>缩放时是否支持动画效果</td>
+</tr>
+<tr>
+<td>zoomAnimDuration</td>
+<td>Number</td>
+<td>0.5</td>
+<td>缩放时动画效果的持续时间，单位秒</td>
+</tr>
+<tr>
+<td>panAnim</td>
+<td>Boolean</td>
+<td>true</td>
+<td>拖拽时是否支持惯性移动</td>
+</tr>
+<tr>
+<td>panAnimMaxSpeed</td>
+<td>Number</td>
+<td>1000</td>
+<td>惯性移动的最大速度，单位像素/秒</td>
+</tr>
+<tr>
+<td>panAnimDuration</td>
+<td>Number</td>
+<td>0.5</td>
+<td>惯性移动的持续时间，单位秒</td>
+</tr>
+<tr>
+<td>tolerance</td>
+<td>Number</td>
+<td>1e-5</td>
+<td>坐标值的容差</td>
+</tr>
+<tr>
+<td>topZIndex</td>
+<td>Number</td>
+<td>100</td>
+<td>该值用于确保拖拽缩放的遮罩层显示在最上层</td>
+</tr>
+<tr>
+<td>doubleDuration</td>
+<td>Number</td>
+<td>0.2</td>
+<td>判断两次点击是否是双击的最大时间间隔，单位秒</td>
+</tr>
+<tr>
+<td>doubleZoom</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许双击时进行缩放（左键双击放大，右键双击缩小）</td>
+</tr>
+<tr>
+<td>pinchZoom</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许双指捏合时进行缩放</td>
+</tr>
+<tr>
+<td>pinchRotate</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许双指捏合时进行地图旋转</td>
+</tr>
+<tr>
+<td>dragPan</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许拖拽时改变地图位置</td>
+</tr>
+<tr>
+<td>shiftZoom</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许按住shift后点击鼠标拉框放大</td>
+</tr>
+<tr>
+<td>scrollZoom</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许鼠标滚动进行缩放</td>
+</tr>
+<tr>
+<td>continuouslyZoom</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许无极缩放，当设为false时滚轮滚动将产生和鼠标双击放大类似的效果</td>
+</tr>
+<tr>
+<td>touchTol</td>
+<td>Number</td>
+<td>8</td>
+<td>触摸屏上操作的容差，单位像素</td>
+</tr>
+<tr>
+<td>recordStatus</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否在浏览器历史中记录每一次更新的状态</td>
+</tr>
+<tr>
+<td>wrap</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否显示环绕地图，该属性不支持IE7/8浏览器</td>
+</tr>
+<tr>
+<td>mask</td>
+<td>Boolean</td>
+<td>false</td>
+<td>是否在地图上使用遮罩层，该属性不支持IE7/8浏览器</td>
+</tr>
+<tr>
+<td>maskColor</td>
+<td>String</td>
+<td>&lsquo;#000&rsquo;</td>
+<td>遮罩层的颜色</td>
+</tr>
+<tr>
+<td>maskOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>遮罩层的透明度</td>
+</tr>
+<tr>
+<td>canvasAnimRedraw</td>
+<td>Boolean</td>
+<td>false</td>
+<td>Canvas模式下显示动画时是否重绘数据，默认不重绘，重绘效果更加连续但是对性能会有影响</td>
+</tr>
+<tr>
+<td>canvasExpandFactor</td>
+<td>Number</td>
+<td>0.25</td>
+<td>Canvas模式下地图渲染范围的扩充倍数，如果希望地图拖动时边缘尽可能少出现空白区域，则可以将该值适当调大（不超过1.0），注意，该值的增大会加载额外的当前窗口外部的数据</td>
+</tr>
+<tr>
+<td>initStatus</td>
+<td>Object</td>
+<td>{ center: [0,0], res: 156543.033928, rotate: 0 }</td>
+<td>地图初始状态，包括地图中心，地图分辨率和地图旋转角度</td>
+</tr>
+</tbody>
+</table>
+<h3 id="map-methods">方法</h3>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>view( [<a href="#point">Point</a>] center, [Number] width, [Number] height, [Number] rotate )</td>
+<td>this</td>
+<td>缩放、旋转地图到指定的状态</td>
+</tr>
+<tr>
+<td>getExtent([Number] expandDis)</td>
+<td><a href="#extent">Extent</a></td>
+<td>获取地图的范围，如指定expandDis则将地图范围向外扩展一定距离</td>
+</tr>
+<tr>
+<td>getRotate()</td>
+<td>Number</td>
+<td>获取地图旋转的角度</td>
+</tr>
+<tr>
+<td>getSize()</td>
+<td>Array</td>
+<td>获取地图容器的尺寸，格式为[width, height]</td>
+</tr>
+<tr>
+<td>getDrawSize()</td>
+<td>Array</td>
+<td>获取新绘制的地图尺寸，格式为[width, height]</td>
+</tr>
+<tr>
+<td>getLayers()</td>
+<td>Array</td>
+<td>获取当前所有图层</td>
+</tr>
+<tr>
+<td>getLayer( [String] id )</td>
+<td><a href="#layer">Layer</a></td>
+<td>根据id获取当前图层</td>
+</tr>
+<tr>
+<td>addLayer( [<a href="#layer">Layer</a>] layer )</td>
+<td>String</td>
+<td>添加图层，返回图层id</td>
+</tr>
+<tr>
+<td>getCenter()</td>
+<td><a href="#point">Point</a></td>
+<td>获取当前地图的中心</td>
+</tr>
+<tr>
+<td>getResolution()</td>
+<td>Number</td>
+<td>获取当前地图的分辨率</td>
+</tr>
+<tr>
+<td>zoomTo( [<a href="#point">Point</a>] center, [Number] width, [Number] height, [Object] options )</td>
+<td>this</td>
+<td>缩放到指定的状态</td>
+</tr>
+<tr>
+<td>zoomRes( [<a href="#point">Point</a>] center, [Number] res, [Object] options )</td>
+<td>this</td>
+<td>缩放到指定的分辨率</td>
+</tr>
+<tr>
+<td>zoomExtent( [<a href="#extent">Extent</a>] extent, [Object] options)</td>
+<td>this</td>
+<td>缩放到指定的范围</td>
+</tr>
+<tr>
+<td>zoomIn( [Object] options )</td>
+<td>this</td>
+<td>放大到下一级别</td>
+</tr>
+<tr>
+<td>zoomOut( [Object] options )</td>
+<td>this</td>
+<td>缩小到上一级别</td>
+</tr>
+<tr>
+<td>centerAt( [<a href="#point">Point</a>] center, [Object] options )</td>
+<td>this</td>
+<td>以指定坐标点为中心将地图居中</td>
+</tr>
+<tr>
+<td>panBy( [Number] offsetX, [Number] offsetY, [Object] options )</td>
+<td>this</td>
+<td>根据偏移改变地图显示位置</td>
+</tr>
+<tr>
+<td>rotateTo( [Number] degree, [Object] options )</td>
+<td>this</td>
+<td>将地图旋转指定角度</td>
+</tr>
+<tr>
+<td>isZooming()</td>
+<td>Boolean</td>
+<td>是否正在缩放</td>
+</tr>
+<tr>
+<td>isPanning()</td>
+<td>Boolean</td>
+<td>是否正在拖拽</td>
+</tr>
+<tr>
+<td>isRotating()</td>
+<td>Boolean</td>
+<td>是否正在旋转</td>
+</tr>
+<tr>
+<td>isDragging()</td>
+<td>Boolean</td>
+<td>是否正在拖拽</td>
+</tr>
+<tr>
+<td>isPinching()</td>
+<td>Boolean</td>
+<td>是否正在双指捏合缩放</td>
+</tr>
+<tr>
+<td>toScreen( [<a href="#point">Point</a>] mapPoint )</td>
+<td><a href="#point">Point</a></td>
+<td>将地图坐标转换为屏幕坐标</td>
+</tr>
+<tr>
+<td>toMap( [<a href="#point">Point</a>] screenPoint )</td>
+<td><a href="#point">Point</a></td>
+<td>将屏幕坐标转换为地图坐标</td>
+</tr>
+<tr>
+<td>showPopup( [<a href="#point">Point</a>] mapPoint, [String] html, [Number] offsetX, [Number] offsetY )</td>
+<td>this</td>
+<td>在地图上显示气泡</td>
+</tr>
+<tr>
+<td>hidePopup( [Boolean] clearContent )</td>
+<td>this</td>
+<td>隐藏地图上的气泡，隐藏的同时可以通过指定clearContent为true来清除其中的内容</td>
+</tr>
+<tr>
+<td>addMask( [<a href="#graphic">Graphic</a>] graphic )</td>
+<td>this</td>
+<td>在遮罩层上添加一个图形对象，只有这个图形对象下的内容可见，注意，只有添加圆形和多边形才有效</td>
+</tr>
+<tr>
+<td>clearMask()</td>
+<td>this</td>
+<td>清除遮罩层</td>
+</tr>
+<tr>
+<td>redraw()</td>
+<td>this</td>
+<td>强制重绘地图</td>
+</tr>
+<tr>
+<td>isPrintable()</td>
+<td>Boolean</td>
+<td>是否支持打印</td>
+</tr>
+<tr>
+<td>print([Number] imageWidth, [Number] imageHeight)</td>
+<td>String</td>
+<td>打印地图为图片，返回Base64编码的图片数据，Layer.Html等外置的内容不会被打印到地图上，imageWidth和imageHeight为导出的图片大小，如果指定则在打印的时候会按照中心对多余部分进行裁剪并缩放</td>
+</tr>
+<tr>
+<td>destroy()</td>
+<td>undefined</td>
+<td>清除地图对象</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Map.zoomTo/Map.zoomExtent/Map.zoomIn/Map.zoomOut/Map.centerAt选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duration</td>
+<td>Number</td>
+<td>0.5</td>
+<td>动画效果的持续时间，单位秒</td>
+</tr>
+<tr>
+<td>fireEnd</td>
+<td>Boolean</td>
+<td>true</td>
+<td>动画播放完成后是否触发相应的事件</td>
+</tr>
+<tr>
+<td>ignoreAnim</td>
+<td>Boolean</td>
+<td>false</td>
+<td>是否忽略动画效果</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Map.panBy选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duration</td>
+<td>Number</td>
+<td>0.5</td>
+<td>动画效果的持续时间，单位秒</td>
+</tr>
+<tr>
+<td>ease</td>
+<td>Number</td>
+<td>0.3</td>
+<td>控制惯性移动的减缓速度，取值为0~1，值越小惯性衰减越快</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Map.rotateTo选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duration</td>
+<td>Number</td>
+<td>0.5</td>
+<td>动画效果的持续时间，单位秒</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="layers">图层 (Layer)</h2>
+<h3 id="layer">Layer</h3>
+<blockquote>
+<p>所有图层的抽象类</p>
+</blockquote>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>minRes</td>
+<td>Number</td>
+<td>undefined</td>
+<td>图层出现的最小分辨率</td>
+</tr>
+<tr>
+<td>maxRes</td>
+<td>Number</td>
+<td>undefined</td>
+<td>图层出现的最大分辨率</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addTo( [<a href="#map">Map</a>] map )</td>
+<td>this</td>
+<td>将图层添加到Map中</td>
+</tr>
+<tr>
+<td>remove()</td>
+<td>this</td>
+<td>将图层从Map中移除</td>
+</tr>
+<tr>
+<td>getOrder()</td>
+<td>Number</td>
+<td>获取当前图层在地图中的顺序，如不在地图中则返回-1</td>
+</tr>
+<tr>
+<td>bringToOrder([Number] order)</td>
+<td>this</td>
+<td>将图层移动到指定的顺序</td>
+</tr>
+<tr>
+<td>bringToTop()</td>
+<td>this</td>
+<td>将图层移动到最上层</td>
+</tr>
+<tr>
+<td>bringToBottom()</td>
+<td>this</td>
+<td>将图层移动到最下层</td>
+</tr>
+<tr>
+<td>bringUp([Number] delta)</td>
+<td>this</td>
+<td>将图层向上移几层</td>
+</tr>
+<tr>
+<td>bringDown([Number] delta)</td>
+<td>this</td>
+<td>将图层向下移几层</td>
+</tr>
+<tr>
+<td>hide()</td>
+<td>this</td>
+<td>隐藏图层</td>
+</tr>
+<tr>
+<td>show()</td>
+<td>this</td>
+<td>显示图层</td>
+</tr>
+<tr>
+<td>isVisible()</td>
+<td>Boolean</td>
+<td>图层当前是否可见</td>
+</tr>
+<tr>
+<td>clear()</td>
+<td>this</td>
+<td>清除图层内容，如果是服务图层则会重新加载新内容</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="tile-layer">Layer.Tile</h3>
+<blockquote>
+<p>Layer.Tile → <a href="#layer">Layer</a></p>
+<p>Tile Layer 瓦片图层，用于加载传统的基于瓦片图片的地图。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">osmLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Tile</span><span class="p">(</span><span class="s1">&#39;http://{s}.tile.osm.org/{z}/{x}/{y}.png&#39;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">cluster</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span>
+<span class="p">});</span>
+<span class="nx">osmLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">arcgisLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Tile</span><span class="p">(</span><span class="s1">&#39;http://server.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}&#39;</span><span class="p">);</span>
+<span class="nx">arcgisLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">bingUrl</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">z</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="nx">i</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">z</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">digit</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">mask</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="nx">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nx">x</span> <span class="o">&amp;</span> <span class="nx">mask</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">digit</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nx">y</span> <span class="o">&amp;</span> <span class="nx">mask</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">digit</span><span class="o">++</span><span class="p">;</span>
+            <span class="nx">digit</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nx">key</span> <span class="o">+=</span> <span class="nx">digit</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="s1">&#39;http://t{s}.tiles.ditu.live.com/tiles/r&#39;</span> <span class="o">+</span> <span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;.png?g=2335&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">bingLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Tile</span><span class="p">(</span><span class="nx">bingUrl</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">cluster</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="p">});</span>
+<span class="nx">bingLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Tile( [String/Function] url, [Object] options )</td>
+<td>url为瓦片图片的参数化地址或地址生成函数，url或调用url函数的返回值中可出现{s}、{z}、{x}、{y}、{i}5个参数，分别代表服务器集群编号、缩放层级、X方向图片索引、Y方向图片索引、Retina支持；如果url为函数，其形式应为function(z, x, y)，z、x、y定义同上；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cluster</td>
+<td>Array</td>
+<td>[]</td>
+<td>服务器集群</td>
+</tr>
+<tr>
+<td>errorTileUrl</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>未加载切片的替代图片</td>
+</tr>
+<tr>
+<td>keepResample</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否保留其它级别的重采样图片，如果需要显示如交通图等本身带有透明度的图片时需要设置为false</td>
+</tr>
+<tr>
+<td>opacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>图层透明度，如果设置小于1的值，则同时keepResample自动为false效果</td>
+</tr>
+<tr>
+<td>retryTimes</td>
+<td>Number</td>
+<td>3</td>
+<td>加载切片的失败重试次数</td>
+</tr>
+<tr>
+<td>tileLiveMs</td>
+<td>Number</td>
+<td>600000</td>
+<td>瓦片在浏览器中有效的最长毫秒数</td>
+</tr>
+<tr>
+<td>tileEnlarge</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否允许瓦片在绘制时适时放大1个像素用于避免可能的接缝，一般如果瓦片带有半透明应将其设置为false</td>
+</tr>
+<tr>
+<td>crossOrigin</td>
+<td>String</td>
+<td>&lsquo;*&rsquo;</td>
+<td>Cross-Origin设置，如果服务器不支持，请设置为空字符串</td>
+</tr>
+<tr>
+<td>originX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>切片原点的X坐标</td>
+</tr>
+<tr>
+<td>originY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>切片原点的Y坐标</td>
+</tr>
+<tr>
+<td>minX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小X坐标</td>
+</tr>
+<tr>
+<td>maxX</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大X坐标</td>
+</tr>
+<tr>
+<td>minY</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小Y坐标</td>
+</tr>
+<tr>
+<td>maxY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大Y坐标</td>
+</tr>
+<tr>
+<td>tileSize</td>
+<td>Number</td>
+<td>256</td>
+<td>切片的尺寸，单位像素</td>
+</tr>
+<tr>
+<td>zoomReses</td>
+<td>Array</td>
+<td>Google的分级，[ 156543.033928, 78271.516964, &hellip;, 0.298582 ]</td>
+<td>分级分辨率数组</td>
+</tr>
+<tr>
+<td>maxRes</td>
+<td>Number</td>
+<td>156543.033928</td>
+<td>图层显示的最大分辨率</td>
+</tr>
+<tr>
+<td>minRes</td>
+<td>Number</td>
+<td>0.29858215</td>
+<td>图层显示的最小分辨率</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="graphic-layer">Layer.Graphic</h3>
+<blockquote>
+<p>Layer.Graphic → <a href="#layer">Layer</a></p>
+<p>矢量图形图层，图层中可以放置各种<strong><a href="#graphic">Graphic</a></strong>，如点 [<a href="#point-graphic">Graphic.Point</a>]、线段 [<a href="#polyline-graphic">Graphic.Polyline</a>]、 多边形 [<a href="#polygon-graphic">Graphic.Polygon</a>]、 圆 [<a href="#circle-graphic">Graphic.Circle</a>]等，这些矢量图形都会在浏览器中被实时地显示给用户。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">()).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">setStyle</span><span class="p">([</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;num&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;==&quot;city&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;0&#39;</span><span class="p">],</span> <span class="p">{</span> <span class="c1">// 给type字段值等于&#39;city&#39;且num字段值大于0的矢量图形对象指定特定的样式</span>
+    <span class="nx">fillColor</span><span class="o">:</span> <span class="s1">&#39;#000&#39;</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Point</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">{</span> <span class="c1">// 这个对象将被显示成上面指定的样式</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;city&#39;</span><span class="p">,</span>
+    <span class="nx">num</span><span class="o">:</span> <span class="mi">0</span>
+<span class="p">});</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">layer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Graphic()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>add( [<a href="#graphic">Graphic</a>] graphic, [Number] id, [Boolean] noRedraw )</td>
+<td>Number</td>
+<td>添加一个图形对象，并返回id，如果指定id，则判断该id是否存在，如存在则直接返回已存在的图形对象的id，如指定noRedraw为true则暂不重绘，这在添加大量数据时对性能有帮助</td>
+</tr>
+<tr>
+<td>get( [Number] id )</td>
+<td><a href="#graphic">Graphic</a></td>
+<td>根据指定的id返回图层上某个对象</td>
+</tr>
+<tr>
+<td>all()</td>
+<td>Array</td>
+<td>返回所有对象</td>
+</tr>
+<tr>
+<td>query( [<a href="#extent">Extent</a>] extent )</td>
+<td>Array</td>
+<td>返回给定范围内的对象</td>
+</tr>
+<tr>
+<td>count()</td>
+<td>Number</td>
+<td>获取图层上所有对象的个数</td>
+</tr>
+<tr>
+<td>clear()</td>
+<td>this</td>
+<td>移除图层上所有对象</td>
+</tr>
+<tr>
+<td>setStyle( [Array] fields, [Array] conditions, [Object] options )</td>
+<td>this</td>
+<td>设置满足某条件下对象的显示样式，options为指定的样式，它将会被合并到每个图形对象的options中；如fields或conditions为空，则设置为图层默认样式</td>
+</tr>
+<tr>
+<td>clearStyles( [Object] options )</td>
+<td>this</td>
+<td>清空所有样式，options为清空后的样式，它将会被合并到每个图形对象的options中</td>
+</tr>
+<tr>
+<td>calcDataExtent( [Number] expand )</td>
+<td><a href="#extent">Extent</a></td>
+<td>根据所有对象的位置计算并返回一个地图范围，expand为额外的缩放倍数，如不指定则返回正好包括所有对象的地图范围</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="html-layer">Layer.Html</h3>
+<blockquote>
+<p>Layer.Html → <a href="#layer">Layer</a></p>
+<p>HTML图层，图层中可以放置HTML内容，这些HTML内容都会以DIV的形式在浏览器中被实时地显示给用户。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Html</span><span class="p">()).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addHtml</span><span class="p">(</span><span class="s1">&#39;&lt;input type=&quot;button&quot; value=&quot;...&quot;&gt;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Html()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addHtml( [String] html, [Number] x, [Number] y)</td>
+<td>Number</td>
+<td>在指定坐标处添加一个HTML对象，并返回id</td>
+</tr>
+<tr>
+<td>getHtml( [Number] id )</td>
+<td>HTMLElement</td>
+<td>根据指定的id返回图层上某个HTML对象</td>
+</tr>
+<tr>
+<td>removeHtml( [Number] id )</td>
+<td>this</td>
+<td>根据指定的id移除图层上某个HTML对象</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="image-layer">Layer.Image</h3>
+<blockquote>
+<p>Layer.Image → <a href="#layer">Layer</a></p>
+<p>Image图层，图层中可以放置图片内容，这些图片会自动缩放以维持自身在地图中固定的位置。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="p">(</span><span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Image</span><span class="p">()).</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addImage</span><span class="p">(</span><span class="s1">&#39;a.jpg&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e6</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e6</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Image()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>errorImageUrl</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>未加载图片的替代图片</td>
+</tr>
+<tr>
+<td>opacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>图层透明度，如果设置小于1的值，则同时keepResample自动为false效果</td>
+</tr>
+<tr>
+<td>retryTimes</td>
+<td>Number</td>
+<td>3</td>
+<td>加载切片的失败重试次数</td>
+</tr>
+<tr>
+<td>crossOrigin</td>
+<td>String</td>
+<td>&lsquo;*&rsquo;</td>
+<td>Cross-Origin设置，如果服务器不支持，请设置为空字符串</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addImage( [String] imageUrl, [Number] xmin, [Number] ymin, [Number] xmax, [Number] ymax)</td>
+<td>Number</td>
+<td>在指定矩形形状内放置一个图片，并返回id</td>
+</tr>
+<tr>
+<td>getImage( [Number] id )</td>
+<td>Image</td>
+<td>根据指定的id返回图层上某个图片对象</td>
+</tr>
+<tr>
+<td>removeImage( [Number] id )</td>
+<td>this</td>
+<td>根据指定的id移除图层上某个图片对象</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="feature-service-layer">Layer.FeatureService</h3>
+<blockquote>
+<p>Layer.FeatureService → <a href="#graphic-layer">Layer.Graphic</a> → <a href="#layer">Layer</a></p>
+<p>关联矢量数据服务的图层，通过指定的HTTP请求自动获取数据并显示在图层上。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">func</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">extent</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// 该请求是指定地图的一个范围，返回这个范围中所有的数据</span>
+    <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Earthquakes/EarthquakesFromLastSevenDays/FeatureServer/0/query&#39;</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1">// 指定对该服务进行请求的参数</span>
+        <span class="nx">f</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+        <span class="nx">where</span><span class="o">:</span> <span class="s1">&#39;1=1&#39;</span>
+    <span class="p">};</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nx">extent</span><span class="p">){</span>
+        <span class="nx">data</span><span class="p">.</span><span class="nx">geometryType</span> <span class="o">=</span> <span class="s1">&#39;esriGeometryEnvelope&#39;</span><span class="p">;</span>
+        <span class="nx">data</span><span class="p">.</span><span class="nx">geometry</span> <span class="o">=</span> <span class="nx">extent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nx">extent</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nx">extent</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nx">extent</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">requestOptions</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="nx">responseType</span><span class="o">:</span> <span class="s1">&#39;JSONP&#39;</span><span class="p">,</span>
+        <span class="nx">data</span><span class="o">:</span> <span class="nx">data</span><span class="p">,</span>
+        <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// 解析响应的数据并生成Graphic对象添加到图层上</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">onSuccess</span><span class="p">(</span><span class="nx">extent</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">error</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">onError</span><span class="p">(</span><span class="nx">extent</span><span class="p">);</span>
+        <span class="p">},</span>
+        <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">onComplete</span><span class="p">(</span><span class="nx">extent</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="nx">G</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">requestOptions</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">FeatureService</span><span class="p">(</span><span class="nx">func</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.FeatureService( [Function] func, [Object] options )</td>
+<td>func为根据范围获取数据的具体实现方法；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mode</td>
+<td>String</td>
+<td>&lsquo;all&rsquo;</td>
+<td>从服务获取数据的方式，可选all、tile，分别对应一次获取全部数据、按块获取数据</td>
+</tr>
+<tr>
+<td>vacuumCount</td>
+<td>Number</td>
+<td>1000</td>
+<td>图层上对象大于这个数值时会适时清理屏幕外的不可见对象</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>如果设置mode为tile，注意确认Layer.FeatureService的层级设置，其默认值为类Google样式的互联网地图服务，如地图的空间参考与之并不一致，请注意修改。</strong></p>
+</blockquote>
+<hr>
+<h3 id="geohey-feature-layer">Layer.GeoHeyFeature</h3>
+<blockquote>
+<p>Layer.GeoHeyFeature → <a href="#feature-service-layer">Layer.FeatureService</a> → <a href="#graphic-layer">Layer.Graphic</a> → <a href="#layer">Layer</a></p>
+<p>关联GeoHey数据服务的图层，通过指定的URL地址和HTTP请求模式自动获取数据并显示在图层上。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">GeoHeyFeature</span><span class="p">(</span><span class="s1">&#39;http://geohey.com/s/data/9ae0fb8cf97f4566a5681d742b6fae4c&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">apiKey</span><span class="o">:</span> <span class="s1">&#39;MzE5YTE0NGJkNDkyNDhjNWE5Y2QwOWM1NDljZmFhZWQ&#39;</span>
+<span class="p">});</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.GeoHeyFeature( [String] url, [Object] options )</td>
+<td>url为指向GeoHey数据服务的地址；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>apiKey</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>用户的API访问凭证</td>
+</tr>
+<tr>
+<td>where</td>
+<td>String</td>
+<td>&lsquo;1=1&rsquo;</td>
+<td>过滤条件</td>
+</tr>
+<tr>
+<td>outFields</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>返回的字段列表，格式如&rsquo;[id, name]&rsquo;，如留空表示返回所有字段</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>Number</td>
+<td>1000</td>
+<td>限制返回的结果数量</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="label-layer">Layer.Label</h3>
+<blockquote>
+<p>Layer.Label → <a href="#layer">Layer</a></p>
+<p>关联标注服务的图层，通过指定的URL地址自动获取标注数据并显示在图层上。标注图层提供对文字、图标等标注信息不同于传统瓦片图片的效果，在地图旋转、缩放的情况下均有较好的显示效果。该功能需特殊的服务器功能支持，普通的在线地图服务并无此功能。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Label</span><span class="p">(</span><span class="s1">&#39;../data/label/{z}_{x}_{y}{i}.json&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">icons</span><span class="o">:</span> <span class="s1">&#39;../data/icons/&#39;</span><span class="p">});</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Label( [String] url, [Object] options )</td>
+<td>url为指向服务的地址，url中可出现{s}、{z}、{x}、{y}、{i}6个参数，分别代表服务器集群编号、缩放层级、X方向图片索引、Y方向图片索引、Retina支持；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>icons</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>所用到图标所在的URL，该URL会添加到icon的相对路径之前</td>
+</tr>
+<tr>
+<td>cluster</td>
+<td>Array</td>
+<td>[]</td>
+<td>服务器集群</td>
+</tr>
+<tr>
+<td>crossOrigin</td>
+<td>String</td>
+<td>&lsquo;*&rsquo;</td>
+<td>Cross-Origin设置，如果服务器不支持，请设置为空字符串</td>
+</tr>
+<tr>
+<td>originX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>标注分块的原点X坐标</td>
+</tr>
+<tr>
+<td>originY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>标注分块的原点Y坐标</td>
+</tr>
+<tr>
+<td>minX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小X坐标</td>
+</tr>
+<tr>
+<td>maxX</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大X坐标</td>
+</tr>
+<tr>
+<td>minY</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小Y坐标</td>
+</tr>
+<tr>
+<td>maxY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大Y坐标</td>
+</tr>
+<tr>
+<td>tileSize</td>
+<td>Number</td>
+<td>256</td>
+<td>标注分块的尺寸，单位像素</td>
+</tr>
+<tr>
+<td>zoomReses</td>
+<td>Array</td>
+<td>Google的分级，[ 156543.033928, 78271.516964, &hellip;, 0.298582 ]</td>
+<td>分级分辨率数组</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="tiled-service-layer">Layer.TiledService</h3>
+<blockquote>
+<p>Layer.TiledService → <a href="#layer">Layer</a></p>
+<p>通用的分片数据图层，通过指定的HTTP请求模式自动获取数据并可进行进一步操作。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">TiledService</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">){</span>
+    <span class="kd">var</span> <span class="nx">tileInfo</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">];</span>
+    <span class="nx">G</span><span class="p">.</span><span class="nx">Util</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;../data/label/&#39;</span> <span class="o">+</span> <span class="nx">z</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nx">x</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nx">y</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">responseType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+        <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xhr</span><span class="p">,</span> <span class="nx">data</span><span class="p">){</span><span class="nx">tsLayer</span><span class="p">.</span><span class="nx">onSuccess</span><span class="p">(</span><span class="nx">tileInfo</span><span class="p">,</span> <span class="nx">data</span><span class="p">)},</span>
+        <span class="nx">error</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xhr</span><span class="p">){</span><span class="nx">tsLayer</span><span class="p">.</span><span class="nx">onError</span><span class="p">(</span><span class="nx">tileInfo</span><span class="p">)},</span>
+        <span class="nx">complete</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">xhr</span><span class="p">){</span><span class="nx">tsLayer</span><span class="p">.</span><span class="nx">onComplete</span><span class="p">(</span><span class="nx">tileInfo</span><span class="p">)}</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;loadTileStart&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+<span class="p">}).</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;loadTileSuccess&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+<span class="p">}).</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;loadTileError&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+<span class="p">}).</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;loadTileComplete&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+<span class="p">}).</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;unusedTile&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">,</span> <span class="nx">e</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.TiledService( [Function] func, [Object] options )</td>
+<td>func为根据 x(分片的x索引), y(分片的y索引), z(分片的层级) 获取数据的具体实现方法；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>TiledService的层级设置，其默认值为类Google样式的互联网地图服务，如地图的空间参考与之并不一致，请注意修改。</strong></p>
+</blockquote>
+<hr>
+<h3 id="vector-cache-layer">Layer.VectorCache</h3>
+<blockquote>
+<p>Layer.VectorCache → <a href="#graphic-layer">Layer.Graphic</a> → <a href="#layer">Layer</a></p>
+<p>关联矢量切片服务的图层，通过指定的URL地址自动获取矢量切片数据并显示在图层上。矢量切片图层提供对矢量数据不同于传统瓦片图片的效果。该功能需特殊的服务器功能支持，普通的在线地图服务并无此功能。</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">VectorCache</span><span class="p">(</span><span class="s1">&#39;http://static.map.net/s/china/vector/{z}/{y}/{x}/{d}&#39;</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.VectorCache( [String] url, [Object] options )</td>
+<td>url为指向服务的地址，url中可出现{s}、{z}、{x}、{y}、{d}五个参数，分别代表服务器集群编号、缩放层级、X方向图片索引、Y方向图片索引、服务端数据类型；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cluster</td>
+<td>Array</td>
+<td>[]</td>
+<td>服务器集群</td>
+</tr>
+<tr>
+<td>originX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>标注分块的原点X坐标</td>
+</tr>
+<tr>
+<td>originY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>标注分块的原点Y坐标</td>
+</tr>
+<tr>
+<td>minX</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小X坐标</td>
+</tr>
+<tr>
+<td>maxX</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大X坐标</td>
+</tr>
+<tr>
+<td>minY</td>
+<td>Number</td>
+<td>-20037508.342787</td>
+<td>图层范围的最小Y坐标</td>
+</tr>
+<tr>
+<td>maxY</td>
+<td>Number</td>
+<td>20037508.342787</td>
+<td>图层范围的最大Y坐标</td>
+</tr>
+<tr>
+<td>tileSize</td>
+<td>Number</td>
+<td>256</td>
+<td>标注分块的尺寸，单位像素</td>
+</tr>
+<tr>
+<td>zoomReses</td>
+<td>Array</td>
+<td>Google的分级，[ 156543.033928, 78271.516964, &hellip;, 0.298582 ]</td>
+<td>分级分辨率数组</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="graphics">图形对象</h2>
+<h3 id="graphic">Graphic</h3>
+<blockquote>
+<p>所有矢量图形的抽象类</p>
+</blockquote>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clickable</td>
+<td>Boolean</td>
+<td>false</td>
+<td>对象是否可被用户点击</td>
+</tr>
+<tr>
+<td>allowPan</td>
+<td>Boolean</td>
+<td>false</td>
+<td>当对象的clickable为true时，默认地图是不可被拖动的，但是也可以通过设置这个属性为true让地图也可以拖动</td>
+</tr>
+<tr>
+<td>vertexShape</td>
+<td>String</td>
+<td>&lsquo;circle&rsquo;</td>
+<td>编辑时节点的形状，取值为&rsquo;circle&rsquo;或&rsquo;rect&rsquo;</td>
+</tr>
+<tr>
+<td>vertexSize</td>
+<td>Number</td>
+<td>16</td>
+<td>编辑时节点的边长</td>
+</tr>
+<tr>
+<td>vertexColor</td>
+<td>String</td>
+<td>&lsquo;#fff&rsquo;</td>
+<td>编辑时节点的边线颜色</td>
+</tr>
+<tr>
+<td>vertexDashArray</td>
+<td>String</td>
+<td>[6, 2]</td>
+<td>编辑时节点的虚线样式，取值如[10, 5, &hellip;]，该选项在某些移动平台上无效</td>
+</tr>
+<tr>
+<td>vertexFillColor</td>
+<td>String</td>
+<td>&lsquo;#ff0&rsquo;</td>
+<td>编辑时节点的填充色</td>
+</tr>
+<tr>
+<td>lineHighlightColor</td>
+<td>String</td>
+<td>&lsquo;#0ff&rsquo;</td>
+<td>线的高亮颜色，一般在编辑状态使用</td>
+</tr>
+<tr>
+<td>lineHighlightWiden</td>
+<td>Number</td>
+<td>2</td>
+<td>线的高亮宽度变化，一般在鼠标移动到对象时提醒使用</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addTo( [<a href="#layer">Layer</a>] layer, [Number] id, [Boolean] noRedraw )</td>
+<td>this</td>
+<td>将对象添加到图层中，id可选，如不指定将对id进行自动分配，如指定noRedraw为true则暂不重绘，这在添加大量数据时对性能有帮助</td>
+</tr>
+<tr>
+<td>remove( [Boolean] noRedraw )</td>
+<td>this</td>
+<td>将对象从图层中移除，如指定noRedraw为true则暂不重绘，这在移除大量数据时对性能有帮助</td>
+</tr>
+<tr>
+<td>id()</td>
+<td>Number</td>
+<td>获取对象的ID</td>
+</tr>
+<tr>
+<td>updateOptions( [Object] options )</td>
+<td>this</td>
+<td>更新对象的选项，会导致图形重新绘制</td>
+</tr>
+<tr>
+<td>updateGeom( [<a href="#geometry">Geometry</a>] geom )</td>
+<td>this</td>
+<td>更新对象的几何信息，会导致图形重新绘制</td>
+</tr>
+<tr>
+<td>updateAttrs( [Object] attrs )</td>
+<td>this</td>
+<td>更新对象的属性信息，属性信息中有和绘制样式相关的内容时会导致图形重新绘制</td>
+</tr>
+<tr>
+<td>bringToTop()</td>
+<td>this</td>
+<td>将对象移动到图层最上层</td>
+</tr>
+<tr>
+<td>startEdit( [Object] options )</td>
+<td>this</td>
+<td>开始编辑，options为编辑时指定的选项，此处设置将覆盖Graphic的默认选项</td>
+</tr>
+<tr>
+<td>endEdit()</td>
+<td>this</td>
+<td>停止编辑</td>
+</tr>
+<tr>
+<td>isEditing()</td>
+<td>Boolean</td>
+<td>是否处于编辑状态</td>
+</tr>
+<tr>
+<td>clone()</td>
+<td><a href="#graphic">Graphic</a></td>
+<td>返回克隆对象</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="point-graphic">Graphic.Point</h3>
+<blockquote>
+<p>Graphic.Point → <a href="#graphic">Graphic</a></p>
+<p>点图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Point</span><span class="p">([</span><span class="mf">116.39</span><span class="p">,</span> <span class="mf">39.9</span><span class="p">],</span> <span class="p">{</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;beijing&#39;</span>
+    <span class="p">},</span> <span class="p">{</span>
+        <span class="nx">shape</span><span class="o">:</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+        <span class="nx">size</span><span class="o">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+        <span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">40</span><span class="p">],</span>
+        <span class="nx">image</span><span class="o">:</span> <span class="s1">&#39;images/pin{i}.png&#39;</span><span class="p">,</span>
+        <span class="nx">clickable</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">});</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Point( [<a href="#point">Point</a>] geom, [Object] attrs, [Object] options )</td>
+<td>geom为几何对象；attrs为属性对象；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>shape</td>
+<td>String</td>
+<td>&lsquo;circle&rsquo;</td>
+<td>可选值有 circle / rect / image / text，分别用圆形、矩形、图片、文字来表示点</td>
+</tr>
+<tr>
+<td>size</td>
+<td>Array</td>
+<td>[12, 12]</td>
+<td>图形的尺寸，circle图形只会使用数组中第一个值作为直径，text图形只会使用数组中第一个值作为文字的尺寸</td>
+</tr>
+<tr>
+<td>offset</td>
+<td>Array</td>
+<td>[0, 0]</td>
+<td>X和Y方向上的偏移，单位像素，circle、rect、text以中心点为原点，image以图片左上角为原点</td>
+</tr>
+<tr>
+<td>image</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>shape为&rsquo;image&rsquo;时所显示图片的URL，如&rsquo;images/pin.png&rsquo;；如要支持视网膜屏，该值需设置为带参数的字符串，如&rsquo;images/pin{i}.png&rsquo;，其中&rsquo;i&rsquo;参数在视网膜屏下会被替换为&rsquo;@2x&rsquo;，因此同时还需要准备&rsquo;images/pin@2x.png&rsquo;这张图片</td>
+</tr>
+<tr>
+<td>imageRotate</td>
+<td>Number</td>
+<td>0</td>
+<td>shape为&rsquo;image&rsquo;时可以设置图片的旋转角度，单位度</td>
+</tr>
+<tr>
+<td>imageGravity</td>
+<td>Boolean</td>
+<td>true</td>
+<td>图片是否受到重力影响，也就是图片始终正对用户</td>
+</tr>
+<tr>
+<td>text</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>shape为&rsquo;text&rsquo;时显示的文字内容</td>
+</tr>
+<tr>
+<td>textFont</td>
+<td>String</td>
+<td>&lsquo;Arial&rsquo;</td>
+<td>文字字体，多个字体以逗号分隔</td>
+</tr>
+<tr>
+<td>textStyle</td>
+<td>String</td>
+<td>&lsquo;normal&rsquo;</td>
+<td>可选值有 normal / italic / bold，分别对应正常字体、斜体、粗体</td>
+</tr>
+<tr>
+<td>textAlign</td>
+<td>String</td>
+<td>&lsquo;center&rsquo;</td>
+<td>可选值有 center / left / right，分别对应居中、左对齐、右对齐</td>
+</tr>
+<tr>
+<td>outline</td>
+<td>Boolean</td>
+<td>false</td>
+<td>是否显示外边线，外边线相关选项对图片无效</td>
+</tr>
+<tr>
+<td>outlineColor</td>
+<td>String</td>
+<td>&lsquo;#000&rsquo;</td>
+<td>外边线的颜色</td>
+</tr>
+<tr>
+<td>outlineDashArray</td>
+<td>Array</td>
+<td>[]</td>
+<td>外边线的虚线样式，取值如[10, 5, &hellip;]，该选项在某些移动平台上无效</td>
+</tr>
+<tr>
+<td>outlineWidth</td>
+<td>Number</td>
+<td>2</td>
+<td>外边线的宽度</td>
+</tr>
+<tr>
+<td>outlineOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>外边线的透明度</td>
+</tr>
+<tr>
+<td>fill</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否填充，填充相关选项对shape为img的情况无效</td>
+</tr>
+<tr>
+<td>fillColor</td>
+<td>String</td>
+<td>&lsquo;#3dc0fd&rsquo;</td>
+<td>填充的颜色</td>
+</tr>
+<tr>
+<td>fillImage</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>填充图片的URL，如设置该值，则fillColor属性无效，如&rsquo;images/grass.jpg&rsquo;；如要支持视网膜屏，该值需设置为带参数的字符串，如&rsquo;images/grass{i}.jpg&rsquo;，其中&rsquo;i&rsquo;参数在视网膜屏下会被替换为&rsquo;@2x&rsquo;，因此同时还需要准备&rsquo;images/grass@2x.jpg&rsquo;这张图片</td>
+</tr>
+<tr>
+<td>fillImageSize</td>
+<td>Array</td>
+<td>[24, 24]</td>
+<td>填充图片的尺寸</td>
+</tr>
+<tr>
+<td>fillOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>填充的透明度</td>
+</tr>
+<tr>
+<td>gradual</td>
+<td>Boolean</td>
+<td>false</td>
+<td>从中心向外显示渐变效果，如设为true，则显示为中心处不透明而边缘处透明度为fillOpacity值的渐变效果，该值只在shape为circle或rect时有效</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="polyline-graphic">Graphic.Polyline</h3>
+<blockquote>
+<p>Graphic.Polyline → <a href="#graphic">Graphic</a></p>
+<p>线图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Polyline</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">]],</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">8</span><span class="p">,</span> 
+        <span class="nx">lineDashArray</span><span class="o">:</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+        <span class="nx">lineColor</span><span class="o">:</span><span class="s1">&#39;#00f&#39;</span>
+    <span class="p">});</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Polyline( [<a href="#polyline">Polyline</a>] geom, [Object] attrs, [Object] options )</td>
+<td>geom为几何对象；attrs为属性对象；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lineColor</td>
+<td>String</td>
+<td>&lsquo;#ff941b&rsquo;</td>
+<td>颜色</td>
+</tr>
+<tr>
+<td>lineDashArray</td>
+<td>Array</td>
+<td>[]</td>
+<td>虚线样式，取值如[10, 5, &hellip;]，该选项在某些移动平台上无效</td>
+</tr>
+<tr>
+<td>lineCap</td>
+<td>String</td>
+<td>&lsquo;butt&rsquo;</td>
+<td>线端点样式，可选值有 butt / square / round</td>
+</tr>
+<tr>
+<td>lineJoin</td>
+<td>String</td>
+<td>&lsquo;round&rsquo;</td>
+<td>线转角样式，可选值有 miter / round / bevel</td>
+</tr>
+<tr>
+<td>lineWidth</td>
+<td>Number</td>
+<td>4</td>
+<td>线宽</td>
+</tr>
+<tr>
+<td>lineOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>透明度</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="polygon-graphic">Graphic.Polygon</h3>
+<blockquote>
+<p>Graphic.Polygon → <a href="#graphic">Graphic</a></p>
+<p>多边形图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Polygon</span><span class="p">([[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]]]);</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Polygon( [<a href="#polygon">Polygon</a>] geom, [Object] attrs, [Object] options )</td>
+<td>geom为几何对象；attrs为属性对象；options为可选的构造选项。Polygon支持洞，注意洞的坐标顺序须和外环的坐标顺序相反，比如外环坐标是顺时针顺序，则洞的坐标顺序必须是逆时针方向。</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>outline</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否显示外边线</td>
+</tr>
+<tr>
+<td>outlineColor</td>
+<td>String</td>
+<td>&lsquo;#ff2e6c&rsquo;</td>
+<td>外边线的颜色</td>
+</tr>
+<tr>
+<td>outlineDashArray</td>
+<td>Array</td>
+<td>[]</td>
+<td>外边线的虚线样式，取值如[10, 5, &hellip;]，该选项在某些移动平台上无效</td>
+</tr>
+<tr>
+<td>outlineCap</td>
+<td>String</td>
+<td>&lsquo;butt&rsquo;</td>
+<td>外边线的端点样式，可选值有 butt / square / round</td>
+</tr>
+<tr>
+<td>outlineJoin</td>
+<td>String</td>
+<td>&lsquo;round&rsquo;</td>
+<td>外边线的转角样式，可选值有 miter / round / bevel</td>
+</tr>
+<tr>
+<td>outlineWidth</td>
+<td>Number</td>
+<td>2</td>
+<td>外边线的宽度</td>
+</tr>
+<tr>
+<td>outlineOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>外边线的透明度</td>
+</tr>
+<tr>
+<td>fill</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否填充，填充相关选项对图片无效</td>
+</tr>
+<tr>
+<td>fillColor</td>
+<td>String</td>
+<td>&lsquo;#000&rsquo;</td>
+<td>填充的颜色</td>
+</tr>
+<tr>
+<td>fillImage</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>填充图片的URL，如设置该值，则fillColor属性无效，如&rsquo;images/grass.jpg&rsquo;；如要支持视网膜屏，该值需设置为带参数的字符串，如&rsquo;images/grass{i}.jpg&rsquo;，其中&rsquo;i&rsquo;参数在视网膜屏下会被替换为&rsquo;@2x&rsquo;，因此同时还需要准备&rsquo;images/grass@2x.jpg&rsquo;这张图片</td>
+</tr>
+<tr>
+<td>fillImageSize</td>
+<td>Array</td>
+<td>[24, 24]</td>
+<td>填充图片的尺寸</td>
+</tr>
+<tr>
+<td>fillOpacity</td>
+<td>Number</td>
+<td>0.6</td>
+<td>填充的透明度</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="circle-graphic">Graphic.Circle</h3>
+<blockquote>
+<p>Graphic.Circle → <a href="#graphic">Graphic</a></p>
+<p>多边形图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Circle</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">]);</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Circle( [<a href="#circle">Circle</a>] geom, [Object] attrs, [Object] options )</td>
+<td>geom为几何对象；attrs为属性对象；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>outline</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否显示外边线</td>
+</tr>
+<tr>
+<td>outlineColor</td>
+<td>String</td>
+<td>&lsquo;#fff&rsquo;</td>
+<td>外边线的颜色</td>
+</tr>
+<tr>
+<td>outlineDashArray</td>
+<td>Array</td>
+<td>[]</td>
+<td>外边线的虚线样式，取值如[10, 5, &hellip;]，该选项在某些移动平台上无效</td>
+</tr>
+<tr>
+<td>outlineWidth</td>
+<td>Number</td>
+<td>2</td>
+<td>外边线的宽度</td>
+</tr>
+<tr>
+<td>outlineOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>外边线的透明度</td>
+</tr>
+<tr>
+<td>fill</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否填充，填充相关选项对图片无效</td>
+</tr>
+<tr>
+<td>fillColor</td>
+<td>String</td>
+<td>&lsquo;#000&rsquo;</td>
+<td>填充的颜色</td>
+</tr>
+<tr>
+<td>fillImage</td>
+<td>String</td>
+<td>&lsquo;&rsquo;</td>
+<td>填充图片的URL，如设置该值，则fillColor属性无效，如&rsquo;images/grass.jpg&rsquo;；如要支持视网膜屏，该值需设置为带参数的字符串，如&rsquo;images/grass{i}.jpg&rsquo;，其中&rsquo;i&rsquo;参数在视网膜屏下会被替换为&rsquo;@2x&rsquo;，因此同时还需要准备&rsquo;images/grass@2x.jpg&rsquo;这张图片</td>
+</tr>
+<tr>
+<td>fillImageSize</td>
+<td>Array</td>
+<td>[24, 24]</td>
+<td>填充图片的尺寸</td>
+</tr>
+<tr>
+<td>fillOpacity</td>
+<td>Number</td>
+<td>0.6</td>
+<td>填充的透明度</td>
+</tr>
+<tr>
+<td>gradual</td>
+<td>Boolean</td>
+<td>false</td>
+<td>从中心向外显示渐变效果，如设为true，则显示为圆心处不透明而边缘处透明度为fillOpacity值的渐变效果</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="arrow-graphic">Graphic.Arrow</h3>
+<blockquote>
+<p>Graphic.Arrow → <a href="#polygon-graphic">Graphic.Polygon</a></p>
+<p>箭头图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Arrow</span><span class="p">([</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">]);</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Arrow( [<a href="#polyline">Polyline</a>] geom, [Object] attrs, [Object] options )</td>
+<td>geom为几何对象；attrs为属性对象；options为可选的构造选项。</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>headSize</td>
+<td>Number</td>
+<td>30</td>
+<td>箭头斜边长</td>
+</tr>
+<tr>
+<td>headAngle</td>
+<td>Number</td>
+<td>30</td>
+<td>箭头开角，指整个箭头处角度的一半</td>
+</tr>
+<tr>
+<td>neckSize</td>
+<td>Number</td>
+<td>25</td>
+<td>颈处斜边长</td>
+</tr>
+<tr>
+<td>neckAngle</td>
+<td>Number</td>
+<td>15</td>
+<td>颈处开角</td>
+</tr>
+<tr>
+<td>tailSize</td>
+<td>Number</td>
+<td>0</td>
+<td>尾部斜边长</td>
+</tr>
+<tr>
+<td>tailAngle</td>
+<td>Number</td>
+<td>60</td>
+<td>尾部开角</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="group-graphic">Graphic.Group</h3>
+<blockquote>
+<p>Graphic.Group → <a href="#graphic">Graphic</a></p>
+<p>组合图形</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Group</span><span class="p">([</span><span class="nx">g0</span><span class="p">,</span> <span class="nx">g1</span><span class="p">,</span> <span class="nx">g2</span><span class="p">]);</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.Group( [[Array] graphics, [Object] attrs, [Object] options )</td>
+<td>graphics为该组合对象中包含的子对象；attrs为属性对象；options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>child( [Number] id )</td>
+<td><a href="#graphic">Graphic</a></td>
+<td>根据ID获取组合图形内的子图形</td>
+</tr>
+<tr>
+<td>children()</td>
+<td>Array</td>
+<td>返回所有子图形</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="event">事件 (Event)</h2>
+<h3 id="event-listener">事件的监听</h3>
+<blockquote>
+<p>在支持事件的对象上直接调用<code>addListener()</code>方法即可打开监听，调用<code>removeListener()</code>方法即可移除监听。</p>
+<p>别名：bind()=addListener()、unbind()=removeListener()</p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">callback</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">map</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+<span class="nx">map</span><span class="p">.</span><span class="nx">unbind</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+</pre></div>
+
+
+<h3 id="event-format">事件格式</h3>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td id="event">Event </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象] }</code></td>
+</tr>
+<tr>
+<td id="interact-event">InteractEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], mapX: [地图X坐标], mapY: [地图Y坐标], screenX: [屏幕X坐标], screenY: [屏幕X坐标] }</code></td>
+</tr>
+<tr>
+<td id="layer-event">LayerEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], layer: [图层对象] }</code></td>
+</tr>
+<tr>
+<td id="tile-event">TileEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], url: [瓦片图片的URL] }</code></td>
+</tr>
+<tr>
+<td id="graphic-event">GraphicEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], graphic: [图形对象] }</code></td>
+</tr>
+<tr>
+<td id="feature-service-event">FeatureServiceEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], extent: [矢量数据所在的地图范围] }</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 事件方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cancel()</td>
+<td>this</td>
+<td>取消后续事件监听的响应，事件监听按照添加监听的先后顺序从后往前触发，越晚添加的监听越早被触发</td>
+</tr>
+</tbody>
+</table>
+<h3 id="event-list">事件列表</h3>
+<p><strong> <a href="#map">Map</a>的事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;resize&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图容器被调整了尺寸</td>
+</tr>
+<tr>
+<td>&lsquo;click&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>点击地图事件，鼠标点击或触摸轻击均可触发</td>
+</tr>
+<tr>
+<td>&lsquo;virtualclick&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>不区分单击和双击的点击地图事件，单击时触发一次，双击时触发两次</td>
+</tr>
+<tr>
+<td>&lsquo;doubleclick&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>双击地图事件，鼠标双击或连续触摸均可触发</td>
+</tr>
+<tr>
+<td>&lsquo;mouseenter&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>鼠标进入地图</td>
+</tr>
+<tr>
+<td>&lsquo;mouseleave&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>鼠标离开地图</td>
+</tr>
+<tr>
+<td>&lsquo;mousemove&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>鼠标在地图上移动</td>
+</tr>
+<tr>
+<td>&lsquo;mousewheel&rsquo;</td>
+<td><a href='#interact-event'>InteractEvent</a></td>
+<td>滚轮在滚动</td>
+</tr>
+<tr>
+<td>&lsquo;moveStart&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图开始平移，在用鼠标、手指拖拽地图或调用panBy()方法时均会触发</td>
+</tr>
+<tr>
+<td>&lsquo;move&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图平移中</td>
+</tr>
+<tr>
+<td>&lsquo;moveEnd&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图平移结束</td>
+</tr>
+<tr>
+<td>&lsquo;rotateStart&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图开始旋转，在用手指扭转地图或调用rotateTo()方法时均会触发</td>
+</tr>
+<tr>
+<td>&lsquo;rotate&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图旋转中</td>
+</tr>
+<tr>
+<td>&lsquo;rotateEnd&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图旋转结束</td>
+</tr>
+<tr>
+<td>&lsquo;zoomStart&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图开始缩放，在滚轮滚动缩放、用手指捏放地图或调用zoom系列方法时均会触发</td>
+</tr>
+<tr>
+<td>&lsquo;zoom&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图缩放中</td>
+</tr>
+<tr>
+<td>&lsquo;zoomEnd&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>地图缩放结束</td>
+</tr>
+<tr>
+<td>&lsquo;pinchStart&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>用手指捏放地图时触发</td>
+</tr>
+<tr>
+<td>&lsquo;pinch&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>捏合地图中</td>
+</tr>
+<tr>
+<td>&lsquo;pinchEnd&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>捏合地图结束</td>
+</tr>
+<tr>
+<td>&lsquo;layerAdded&rsquo;</td>
+<td><a href='#layer-event'>LayerEvent</a></td>
+<td>有图层被添加到地图上</td>
+</tr>
+<tr>
+<td>&lsquo;layerRemoved&rsquo;</td>
+<td><a href='#layer-event'>LayerEvent</a></td>
+<td>有图层从地图上被移除</td>
+</tr>
+<tr>
+<td>&lsquo;popupShown&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>气泡被弹出</td>
+</tr>
+<tr>
+<td>&lsquo;popupHidden&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>气泡被隐藏</td>
+</tr>
+</tbody>
+</table>
+<p><strong> <a href="#tile-layer">Layer.Tile</a>的事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;tileStart&rsquo;</td>
+<td><a href='#tile-event'>TileEvent</a></td>
+<td>瓦片图片开始加载</td>
+</tr>
+<tr>
+<td>&lsquo;tileSuccess&rsquo;</td>
+<td><a href='#tile-event'>TileEvent</a></td>
+<td>瓦片图片加载成功</td>
+</tr>
+<tr>
+<td>&lsquo;tileError&rsquo;</td>
+<td><a href='#tile-event'>TileEvent</a></td>
+<td>瓦片图片加载失败</td>
+</tr>
+<tr>
+<td>&lsquo;allLoaded&rsquo;</td>
+<td><a href='#event'>Event</a></td>
+<td>所有需要加载的瓦片图片均完成请求，但不保证所有请求都成功</td>
+</tr>
+</tbody>
+</table>
+<p><strong> <a href="#graphic-layer">Layer.Graphic</a>的事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;graphicAdded&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>有图形被添加到图层上</td>
+</tr>
+<tr>
+<td>&lsquo;graphicRemoved&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>有图形从图层上被移除</td>
+</tr>
+<tr>
+<td>&lsquo;graphicGeomUpdated&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>有图形的几何信息被更新</td>
+</tr>
+<tr>
+<td>&lsquo;graphicAttrUpdated&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>有图形的属性信息被更新</td>
+</tr>
+<tr>
+<td>&lsquo;graphicToTop&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>图形被移动到图层的最上层</td>
+</tr>
+<tr>
+<td>&lsquo;graphicClicked&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>图形被点击</td>
+</tr>
+<tr>
+<td>&lsquo;graphicOver&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>鼠标进入对象</td>
+</tr>
+<tr>
+<td>&lsquo;graphicOut&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>鼠标移出对象</td>
+</tr>
+<tr>
+<td>&lsquo;graphicStartEdit&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>开始编辑某图形</td>
+</tr>
+<tr>
+<td>&lsquo;graphicEndEdit&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>结束编辑某图形</td>
+</tr>
+</tbody>
+</table>
+<p><strong> <a href="#feature-service-layer">Layer.FeatureService</a>的事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;loadTileStart&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>指定范围内的数据开始加载</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileSuccess&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>指定范围内的数据加载成功</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileError&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>指定范围内的数据加载失败</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileComplete&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>指定范围内的数据加载结束，无论请求是否成功均触发该事件</td>
+</tr>
+<tr>
+<td>&lsquo;loadAllStart&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>所有数据开始加载</td>
+</tr>
+<tr>
+<td>&lsquo;loadAllSuccess&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>所有数据加载成功</td>
+</tr>
+<tr>
+<td>&lsquo;loadAllError&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>所有数据加载失败</td>
+</tr>
+<tr>
+<td>&lsquo;loadAllComplete&rsquo;</td>
+<td><a href='#feature-service-event'>FeatureServiceEvent</a></td>
+<td>所有数据加载结束，无论请求是否成功均触发该事件</td>
+</tr>
+</tbody>
+</table>
+<p><strong> <a href="#tiled-service-layer">Layer.TiledService</a>的事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;loadTileStart&rsquo;</td>
+<td><a href='#tiled-service-event'>TiledServiceEvent</a></td>
+<td>指定分片内的数据开始加载</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileSuccess&rsquo;</td>
+<td><a href='#tiled-service-event'>TiledServiceEvent</a></td>
+<td>指定分片内的数据加载成功</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileError&rsquo;</td>
+<td><a href='#tiled-service-event'>TiledServiceEvent</a></td>
+<td>指定分片内的数据加载失败</td>
+</tr>
+<tr>
+<td>&lsquo;loadTileComplete&rsquo;</td>
+<td><a href='#tiled-service-event'>TiledServiceEvent</a></td>
+<td>指定分片内的数据加载结束，无论请求是否成功均触发该事件</td>
+</tr>
+<tr>
+<td>&lsquo;unusedTile&rsquo;</td>
+<td><a href='#tiled-service-event'>TiledServiceEvent</a></td>
+<td>指定分片内的数据已经无用，可以进行清理操作</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="project">投影 (Project)</h2>
+<h3 id="project-wm">常见的互联网地图投影Web Mercator</h3>
+<blockquote>
+<p>通过完整的对象名<code>G.Proj.WebMercator</code>可在经纬度坐标和Web Mercator坐标间进行转换。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>project( [Number] longitude, [Number] latitude )</td>
+<td><a href="#point">Point</a></td>
+<td>将经纬度坐标投影为Web Mercator坐标</td>
+</tr>
+<tr>
+<td>unproject( [Number] x, [Number] y )</td>
+<td><a href="#point">Point</a></td>
+<td>将Web Mercator坐标反算为经纬度坐标</td>
+</tr>
+</tbody>
+</table>
+<h3 id="project-gcj">中国特殊的偏移投影</h3>
+<blockquote>
+<p>通过完整的对象名<code>G.Proj.Gcj</code>可在标准经纬度坐标和中国特殊的偏移处理后的坐标间进行转换。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>project( [Number] longitude, [Number] latitude )</td>
+<td><a href="#point">Point</a></td>
+<td>将经纬度坐标投影为中国特殊的偏移坐标</td>
+</tr>
+<tr>
+<td>unproject( [Number] x, [Number] y )</td>
+<td><a href="#point">Point</a></td>
+<td>将中国特殊的偏移坐标反算为经纬度坐标</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="misc">杂项</h2>
+<h3 id="misc-ajax">AJAX请求</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Util.ajax( [String] url, [Object] options )</td>
+<td>XMLHttpRequest/Script</td>
+<td>发送一个AJAX请求，并返回请求对象；options为AJAX选项</td>
+</tr>
+<tr>
+<td>Util.ajaxCancel( [XMLHttpRequest/Script] request )</td>
+<td>undefined</td>
+<td>取消AJAX请求；request为需要取消的AJAX请求对象</td>
+</tr>
+</tbody>
+</table>
+<p><strong> AJAX选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>&lsquo;GET&rsquo;</td>
+<td>请求方法；如指定了JSONP方式，则只会使用GET方法发送请求</td>
+</tr>
+<tr>
+<td>contentType</td>
+<td>String</td>
+<td>&lsquo;application/x-www-form-urlencoded; charset=UTF-8&rsquo;</td>
+<td>发送数据给服务器时内容编码类型</td>
+</tr>
+<tr>
+<td>headers</td>
+<td>Object</td>
+<td></td>
+<td>额外需要设置的HTTP请求头</td>
+</tr>
+<tr>
+<td>data</td>
+<td>Object</td>
+<td></td>
+<td>请求发送的数据；GET方法将数据附加到URL，POST方法根据contentType设置进行编码后作为请求体发送</td>
+</tr>
+<tr>
+<td>responseType</td>
+<td>String</td>
+<td>&lsquo;DATA&rsquo;</td>
+<td>预期服务器返回的数据类型，可选DATA/TEXT/XML/JSON/JSONP</td>
+</tr>
+<tr>
+<td>jsonp</td>
+<td>String</td>
+<td>自动生成</td>
+<td>JSONP的回调函数名，大多数情况不需自行指定</td>
+</tr>
+<tr>
+<td>jsonpCallback</td>
+<td>String</td>
+<td>&lsquo;callback&rsquo;</td>
+<td>服务器指定JSONP回调函数的参数名</td>
+</tr>
+<tr>
+<td>success</td>
+<td>Function(request, data)</td>
+<td>undefined</td>
+<td>请求成功后的回调函数，request为请求对象，data为返回值</td>
+</tr>
+<tr>
+<td>error</td>
+<td>Function(request)</td>
+<td>undefined</td>
+<td>请求失败后的回调函数，request为请求对象</td>
+</tr>
+<tr>
+<td>complete</td>
+<td>Function(request)</td>
+<td>undefined</td>
+<td>请求完成后的回调函数，无论请求成功或失败都会调用，request为请求对象</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-str">字符串处理</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Util.trim( [String] str )</td>
+<td>String</td>
+<td>移除字符串首尾空格</td>
+</tr>
+<tr>
+<td>Util.renderString( [String] template, [Object] data )</td>
+<td>String</td>
+<td i>根据一个字符串模板填充数据并返回结果字符串，模板中以大括号为参数；如template为&rsquo;a</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-obj">对象处理</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Util.merge( [[Object]] objs )</td>
+<td>Object</td>
+<td>合并对象值；如调用merge(obj1, obj2, obj3)，则会将obj2、obj3对象的值依次合并到obj1中，并返回obj1对象</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-color">颜色处理</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Util.colorHex( [Number] red, [Number] green, [Number] blue )</td>
+<td>String</td>
+<td>返回RGB颜色对应的HTML描述，返回格式如&rsquo;#0xff98&rsquo;</td>
+</tr>
+<tr>
+<td>Util.colorRgb( [String] hex )</td>
+<td>Array</td>
+<td>返回HTML描述的颜色对应的RGB数值，返回格式如[255, 0, 0]</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-geom">几何对象工具</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GeomUtil.geomType( [<a href="#geometry">Geometry</a>] geom )</td>
+<td>String</td>
+<td>判断几何对象所对应的几何类型</td>
+</tr>
+<tr>
+<td>GeomUtil.centroid( [<a href="#geometry">Geometry</a>] geom )</td>
+<td><a href="#point">Point</a></td>
+<td>获取几何对象的质心</td>
+</tr>
+<tr>
+<td>GeomUtil.labelPoint( [<a href="#geometry">Geometry</a>] geom )</td>
+<td><a href="#point">Point</a></td>
+<td>获取几何对象的标注点</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-extent">地图范围工具</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ExtentUtil.overlaps( [<a href="#extent">Extent</a>] ext1, [<a href="#extent">Extent</a>] ext2, [Number] tolerance )</td>
+<td>Boolean</td>
+<td>判断范围ext1是否完全覆盖范围ext2，tolerance为允许的坐标误差</td>
+</tr>
+<tr>
+<td>ExtentUtil.contains( [<a href="#extent">Extent</a>] ext, [<a href="#point">Point</a>] p, [Number] tolerance )</td>
+<td>Boolean</td>
+<td>判断范围ext是否包含点p，也即p是否在ext内，tolerance为允许的坐标误差</td>
+</tr>
+<tr>
+<td>ExtentUtil.intersect( [<a href="#extent">Extent</a>] ext1, [<a href="#extent">Extent</a>] ext2 )</td>
+<td><a href="#extent">Extent</a></td>
+<td>返回范围ext1和范围ext2相交的部分</td>
+</tr>
+<tr>
+<td>ExtentUtil.union( [<a href="#extent">Extent</a>] ext1, [<a href="#extent">Extent</a>] ext2 )</td>
+<td><a href="#extent">Extent</a></td>
+<td>返回范围ext1和范围ext2合并后的结果</td>
+</tr>
+<tr>
+<td>ExtentUtil.equals( [<a href="#extent">Extent</a>] ext1, [<a href="#extent">Extent</a>] ext2, [Number] tolerance )</td>
+<td>Boolean</td>
+<td>判断范围ext1和范围ext2是否相等，tolerance为允许的坐标误差</td>
+</tr>
+</tbody>
+</table>
+<h3 id="misc-measure">经纬度测量工具</h3>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GeodeticUtil.sphereDistance( [<a href="#point">Point</a>] p1, [<a href="#point">Point</a>] p2 )</td>
+<td>Number</td>
+<td>计算经纬度坐标p1和p2的球面距离，单位为米</td>
+</tr>
+</tbody>
+</table>
+<p><br>
+<br>
+<br></p>
+<h2 id="module">扩展模块</h2>
+<p>当前可用的模块有：</p>
+<table>
+<thead>
+<tr>
+<th>模块名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#module-anim">anim</a></td>
+<td>显示动画对象</td>
+</tr>
+<tr>
+<td><a href="#module-maps">maps</a></td>
+<td>直接加入第三方地图服务</td>
+</tr>
+<tr>
+<td><a href="#module-draw">draw</a></td>
+<td>提供可以直接在地图上交互绘图的功能</td>
+</tr>
+<tr>
+<td><a href="#module-cluster">cluster</a></td>
+<td>聚类地图</td>
+</tr>
+<tr>
+<td><a href="#module-arcgis">arcgis</a></td>
+<td>对ArcGIS服务的支持</td>
+</tr>
+<tr>
+<td><a href="#module-heat">heat</a></td>
+<td>热度图</td>
+</tr>
+<tr>
+<td><a href="#module-movable">movable</a></td>
+<td>显示动态目标</td>
+</tr>
+<tr>
+<td><a href="#module-geogrid">geogrid</a></td>
+<td>地理网格</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-anim">动画</h3>
+<blockquote>
+<p>模块anim提供了显示动画的方法，你可以显示形状或样式动态变化的点、线、多边形和圆形等。</p>
+<p>Graphic.AnimPoint → <a href="#point-graphic">Graphic.Point</a></p>
+<p>Graphic.AnimPolyline → <a href="#polyline-graphic">Graphic.Polyline</a></p>
+<p>Graphic.AnimPolygon → <a href="#polygon-graphic">Graphic.Polygon</a></p>
+<p>Graphic.AnimCircle → <a href="#circle-graphic">Graphic.Circle</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">AnimPoint</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Point</span><span class="p">([</span><span class="mi">1</span><span class="nx">e7</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e7</span><span class="p">],</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">size</span><span class="o">:</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="p">}),</span> 
+    <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Point</span><span class="p">([</span><span class="mi">1</span><span class="nx">e7</span><span class="p">,</span> <span class="mi">1</span><span class="nx">e7</span><span class="p">],</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">size</span><span class="o">:</span><span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">]</span>
+    <span class="p">})</span>
+<span class="p">);</span>
+<span class="nx">g</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+
+<span class="nx">g</span><span class="p">.</span><span class="nx">play</span><span class="p">();</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Graphic.AnimPoint( [<a href="#point-graphic">Graphic.Point</a>] fromGraphic, [<a href="#point-graphic">Graphic.Point</a>] toGraphic, [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+<tr>
+<td>G.Graphic.AnimPolyline( [<a href="#polyline-graphic">Graphic.Polyline</a>] fromGraphic, [<a href="#polyline-graphic">Graphic.Polyline</a>] toGraphic, [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+<tr>
+<td>G.Graphic.AnimPolygon( [<a href="#polygon-graphic">Graphic.Polygon</a>] fromGraphic, [<a href="#polygon-graphic">Graphic.Polygon</a>] toGraphic, [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+<tr>
+<td>G.Graphic.AnimCircle( [<a href="#circle-graphic">Graphic.Circle</a>] fromGraphic, [<a href="#circle-graphic">Graphic.Circle</a>] toGraphic, [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Graphic.AnimPoint/Graphic.AnimPolygon/Graphic.AnimPolygon/Graphic.AnimCircle 的构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>duration</td>
+<td>Number</td>
+<td>2</td>
+<td>动画持续的时间，单位秒</td>
+</tr>
+<tr>
+<td>repeatCount</td>
+<td>Number</td>
+<td>-1</td>
+<td>动画循环的次数，若小于等于零，则表示动画永远循环显示</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Graphic.AnimPoint/Graphic.AnimPolygon/Graphic.AnimPolygon/Graphic.AnimCircle 的方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>play()</td>
+<td>this</td>
+<td>开始动画</td>
+</tr>
+<tr>
+<td>stop()</td>
+<td>this</td>
+<td>停止动画</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-maps">底图服务</h3>
+<blockquote>
+<p>模块maps提供了更方便访问互联网底图服务的类，注意，互联网底图服务的地址有可能变化从而导致服务不能使用，需要自行升级配置或重写访问类</p>
+<p>Layer.AliMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.AMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.BaiduMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.BingMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.CartoMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.GoogleCnMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.NasaMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.OpenStreetMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.QQMap → <a href="#tile-layer">Layer.Tile</a></p>
+<p>Layer.TiandituMap → <a href="#tile-layer">Layer.Tile</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">BingMap</span><span class="p">(</span><span class="s1">&#39;street&#39;</span><span class="p">);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 各种底图的构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.AliMap()</td>
+<td>阿里云地图</td>
+</tr>
+<tr>
+<td>G.Layer.AMap( [String] type )</td>
+<td>高德地图，type可选 street/street2/sate/satel/traffic 之一</td>
+</tr>
+<tr>
+<td>G.Layer.BaiduMap( [String] type )</td>
+<td>百度地图，type可选 street/sate/satel/traffic 之一</td>
+</tr>
+<tr>
+<td>G.Layer.BingMap( [String] type )</td>
+<td>必应地图，type可选 street/traffic 之一</td>
+</tr>
+<tr>
+<td>G.Layer.CartoMap( [String] type )</td>
+<td>Carto地图，type可选 midnight/eco/flatblue 之一</td>
+</tr>
+<tr>
+<td>G.Layer.GoogleCnMap( [String] type )</td>
+<td>Google中国地图，type可选 street/terrian/sate/satel 之一</td>
+</tr>
+<tr>
+<td>G.Layer.NasaMap( [String] layer, [String] time, [Number] srid, [String] resolution, [String] format)</td>
+<td>NASA提供的系列地图，内容可参考 <a href="https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+Available+Imagery+Products">NASA GIBS</a>。其中layer是NASA提供的图层名字，比如 &lsquo;MODIS_Aqua_Land_Surface_Temp_Day&rsquo;，time为数据的时间，如&lsquo;2014-04-09&rsquo;，srid可选4326(WGS 84)与3857(Web Mercator)，resolution可选&lsquo;250m&rsquo;/&lsquo;500m&rsquo;/&lsquo;1km&rsquo;/&lsquo;2km&rsquo; ,format可选&rsquo;jpg&rsquo;/&rsquo;png&rsquo;。注意，并不是每个地图都支持所有格式，每个地图支持的格式详见链接 <a href="https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+Available+Imagery+Products">NASA GIBS</a>。</td>
+</tr>
+<tr>
+<td>G.Layer.OpenStreetMap()</td>
+<td>OpenStreetMap地图</td>
+</tr>
+<tr>
+<td>G.Layer.QQMap( [String] type )</td>
+<td>腾讯地图，type可选 street/sate/satel 之一</td>
+</tr>
+<tr>
+<td>G.Layer.TiandituMap( [String] type )</td>
+<td>天地图地图，type可选 street/streetl/sate/satel/terrain/terrainl 之一</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 在经纬度坐标和百度坐标间进行转换 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Proj.Baidu.project( [Number] longitude, [Number] latitude )</td>
+<td><a href="#point">Point</a></td>
+<td>将标准经纬度坐标投影为百度经纬坐标</td>
+</tr>
+<tr>
+<td>G.Proj.Baidu.unproject( [Number] x, [Number] y )</td>
+<td><a href="#point">Point</a></td>
+<td>将百度经纬坐标反算为标准经纬度坐标</td>
+</tr>
+<tr>
+<td>G.Proj.Baidu.projectM( [Number] longitude, [Number] latitude )</td>
+<td><a href="#point">Point</a></td>
+<td>将标准经纬度坐标投影为百度米制坐标</td>
+</tr>
+<tr>
+<td>G.Proj.Baidu.unprojectM( [Number] x, [Number] y )</td>
+<td><a href="#point">Point</a></td>
+<td>将百度米制坐标反算为标准经纬度坐标</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-draw">Draw</h3>
+<blockquote>
+<p>模块draw提供了一个可供绘制的图层</p>
+<p>Layer.Draw → <a href="#graphic-layer">Layer.Graphic</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">drawLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Draw</span><span class="p">();</span>
+<span class="nx">drawLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="nx">drawLayer</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;drawEnd&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">graphic</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">drawLayer</span><span class="p">.</span><span class="nx">startDraw</span><span class="p">(</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">fillColor</span><span class="o">:</span><span class="s1">&#39;#f00&#39;</span><span class="p">});</span>
+</pre></div>
+
+
+<blockquote>
+<p>Draw模块绘制多边形和线的操作略加说明：用户可以通过双击结束一个对象的绘制，但是这个双击的位置不作为最后一个节点保存，因为双击操作确定的位置一般不太准确。</p>
+</blockquote>
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Draw()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>startDraw( [String] type , [Object] options)</td>
+<td>this</td>
+<td>进入可绘制状态，type为需要绘制的图形类型，可选值为 circle/point/polyline/polygon/freepolyline/freepolygon/rect；options为给需要绘制的图形设置的样式，可参考各种<a href="#graphic">Graphic</a>的构造选项</td>
+</tr>
+<tr>
+<td>endDraw()</td>
+<td>this</td>
+<td>退出可绘制状态</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;drawStart&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>开始绘制一个图形</td>
+</tr>
+<tr>
+<td>&lsquo;draw&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>正在绘制一个图形，图形的几何属性有变化时触发</td>
+</tr>
+<tr>
+<td>&lsquo;drawEnd&rsquo;</td>
+<td><a href='#graphic-event'>GraphicEvent</a></td>
+<td>结束绘制一个图形</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-cluster">聚类</h3>
+<blockquote>
+<p>模块cluster提供了进行聚类的方法，可以将若干点显示为一个带数字的图形。</p>
+<p>Layer.Cluster → <a href="#graphic-layer">Layer.Graphic</a></p>
+<p>Graphic.Cluster → <a href="#group-graphic">Graphic.Group</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">layer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Cluster</span><span class="p">({</span>
+    <span class="nx">breakValues</span><span class="o">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="p">});</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;clusterClicked&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="kd">var</span> <span class="nx">cluster</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">cluster</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">Point</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]);</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addPoint</span><span class="p">(</span><span class="nx">g</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Cluster( [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Layer.Cluster的构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>radius</td>
+<td>Number</td>
+<td>50</td>
+<td>聚类的半径，单位像素</td>
+</tr>
+<tr>
+<td>showRealRes</td>
+<td>Number</td>
+<td>null</td>
+<td>当地图分辨率小于该值时，不显示聚类</td>
+</tr>
+<tr>
+<td>breakValues</td>
+<td>Array</td>
+<td>[5, 10, 20]</td>
+<td>聚类中包含点数量的分类，不同分类有不同的显示样式</td>
+</tr>
+<tr>
+<td>breakShapeSizes</td>
+<td>Array</td>
+<td>[24, 32, 40, 48]</td>
+<td>不同分类显示图形的尺寸，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakFillColors</td>
+<td>Array</td>
+<td>[&lsquo;#71e28c&rsquo;, &lsquo;#58d7dd&rsquo;, &lsquo;#efcd45&rsquo;, &lsquo;#ff936a&rsquo;]</td>
+<td>不同分类显示图形的填充色，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakFillOpacities</td>
+<td>Array</td>
+<td>[1.0, 1.0, 1.0, 1.0]</td>
+<td>不同分类显示图形的透明度，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakOutlines</td>
+<td>Array</td>
+<td>[true, true, true, true]</td>
+<td>不同分类是否显示图形描边，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakOutlineColors</td>
+<td>Array</td>
+<td>[&lsquo;#71e28c&rsquo;, &lsquo;#58d7dd&rsquo;, &lsquo;#efcd45&rsquo;, &lsquo;#ff936a&rsquo;]</td>
+<td>不同分类显示图形的描边颜色，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakOutlineOpacities</td>
+<td>Array</td>
+<td>[0.6, 0.6, 0.6, 0.6]</td>
+<td>不同分类显示图形的描边透明度，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakOutlineWidths</td>
+<td>Array</td>
+<td>[12, 16, 20, 24]</td>
+<td>不同分类显示图形的描边宽度，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakTextSizes</td>
+<td>Array</td>
+<td>[16, 18, 20, 24]</td>
+<td>不同分类显示图形的文字大小，注意，该数组长度应比breakValues多一个</td>
+</tr>
+<tr>
+<td>breakTextColors</td>
+<td>Array</td>
+<td>[&lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;]</td>
+<td>不同分类显示图形的文字颜色，注意，该数组长度应比breakValues多一个</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 事件格式 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th>格式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td id="cluster-event">ClusterEvent </td>
+<td><code>{ type: [事件类型], target: [触发事件的对象], cluster: [聚类对象] }</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong> 事件 </strong></p>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lsquo;clusterClicked&rsquo;</td>
+<td><a href='#cluster-event'>ClusterEvent</a></td>
+<td>聚类被点击</td>
+</tr>
+<tr>
+<td>&lsquo;clusterOver&rsquo;</td>
+<td><a href='#cluster-event'>ClusterEvent</a></td>
+<td>鼠标进入对象</td>
+</tr>
+<tr>
+<td>&lsquo;clusterOut&rsquo;</td>
+<td><a href='#cluster-event'>ClusterEvent</a></td>
+<td>鼠标移出对象</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addPoint( [<a href="#point-graphic">Graphic.Point</a>] pointGraphic , [Boolean] redrawNow)</td>
+<td>String</td>
+<td>添加一个点</td>
+</tr>
+<tr>
+<td>clear()</td>
+<td>this</td>
+<td>清空所有点</td>
+</tr>
+<tr>
+<td>count()</td>
+<td>Number</td>
+<td>计算所有点数量</td>
+</tr>
+<tr>
+<td>diveIn( [<a href="#group-graphic">Graphic.Cluster</a>] cluster )</td>
+<td>this</td>
+<td>放大聚类图形，显示其下一级子图形</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-arcgis">ArcGIS</h3>
+<blockquote>
+<p>模块arcgis提供了对ArcGIS服务的访问</p>
+<p>Layer.ArcGISFeature → <a href="#vector-service-layer">Layer.VectorService</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">polygonLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">ArcGISFeature</span><span class="p">(</span><span class="s1">&#39;http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Hydrography/Watershed173811/FeatureServer/0&#39;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">fields</span><span class="o">:</span> <span class="s1">&#39;objectid&#39;</span>
+<span class="p">});</span>
+<span class="nx">polygonLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> Layer.ArcGISFeature的构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.ArcGISFeature( [String] url, [Object] options )</td>
+<td>url为指向某个ArcGIS Feature服务的地址；options为可选的构造选项</td>
+</tr>
+<tr>
+<td>﻿</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-heat">Heat</h3>
+<blockquote>
+<p>模块heat提供了客户端的热度图功能，该模块目前只在支持Canvas的浏览器中有效</p>
+<p>Layer.Heat → <a href="#layer">Layer</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">heatLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Heat</span><span class="p">({</span><span class="nx">topValue</span><span class="o">:</span><span class="mi">2</span><span class="p">,</span> <span class="nx">radius</span><span class="o">:</span><span class="mi">2000000</span><span class="p">,</span> <span class="nx">radiusUnit</span><span class="o">:</span><span class="s1">&#39;map&#39;</span><span class="p">});</span>
+<span class="nx">heatLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+
+<span class="nx">map</span><span class="p">.</span><span class="nx">addListener</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">heatLayer</span><span class="p">.</span><span class="nx">addDataPoint</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">mapX</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">mapY</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p><strong> Layer.Heat的构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Heat( [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Layer.Heat的构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>radius</td>
+<td>Number</td>
+<td>30</td>
+<td>绘制热点的半径</td>
+</tr>
+<tr>
+<td>radiusUnit</td>
+<td>String</td>
+<td>&lsquo;pixel&rsquo;</td>
+<td>绘制热点的半径单位，可选有&rsquo;map&rsquo;和&rsquo;pixel&rsquo;，分别对应地图单位和像素单位</td>
+</tr>
+<tr>
+<td>maxOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>最大透明度</td>
+</tr>
+<tr>
+<td>minOpacity</td>
+<td>Number</td>
+<td>0</td>
+<td>最小透明度</td>
+</tr>
+<tr>
+<td>colors</td>
+<td>Object</td>
+<td 0.25: 0.5: 0.75: 1.0: _wzxhzdk:85_00f_wzxhzdk:81_="&lsquo;#00f&rsquo;," _wzxhzdk:86_0ff_wzxhzdk:82_="&lsquo;#0ff&rsquo;," _wzxhzdk:87_0f0_wzxhzdk:83_="&lsquo;#0f0&rsquo;," _wzxhzdk:88_f00_wzxhzdk:84_="&lsquo;#f00&rsquo;"></td>
+<td>分段设置表示热度的颜色</td>
+</tr>
+<tr>
+<td>topValue</td>
+<td>Number</td>
+<td>1</td>
+<td>控制热点的最大值</td>
+</tr>
+<tr>
+<td>drawOnAnim</td>
+<td>Boolean</td>
+<td>false</td>
+<td>动画过程中是否进行重绘</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Layer.Heat的方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addDataPoint( [Number] x, [Number] y, [Number] value, [Boolean] redrawNow )</td>
+<td>[Number]</td>
+<td>添加一个数据点，返回该数据点的id</td>
+</tr>
+<tr>
+<td>removeDataPoint( [Number] id, [Boolean] redrawNow )</td>
+<td>this</td>
+<td>根据id移除一个数据点</td>
+</tr>
+<tr>
+<td>clear([Boolean] forbidRedraw)</td>
+<td>this</td>
+<td>清除图层</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-movable">Movable</h3>
+<blockquote>
+<p>模块movable提供了动态对象的支持</p>
+<p>Graphic.MovablePoint → <a href="#point-graphic">Graphic.Point</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">route</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">]];</span>
+
+<span class="nx">movePoint</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Graphic</span><span class="p">.</span><span class="nx">MovablePoint</span><span class="p">(</span><span class="nx">route</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">shape</span><span class="o">:</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+    <span class="nx">size</span><span class="o">:</span> <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">],</span>
+    <span class="nx">offset</span><span class="o">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">12</span><span class="p">],</span>
+    <span class="nx">image</span><span class="o">:</span> <span class="s1">&#39;boot{i}.png&#39;</span><span class="p">,</span>
+    <span class="nx">duration</span><span class="o">:</span> <span class="mi">5000</span>
+<span class="p">});</span>
+<span class="nx">movePoint</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">graphicLayer</span><span class="p">);</span>
+
+<span class="nx">movePoint</span><span class="p">.</span><span class="nx">setRoute</span><span class="p">(</span><span class="nx">route</span><span class="p">);</span>
+<span class="nx">movePoint</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+</pre></div>
+
+
+<p><strong> Graphic.MovablePoint的构造 </strong></p>
+<blockquote>
+<p>同 <a href="#point-graphic">Graphic.Point</a> 的构造</p>
+</blockquote>
+<p><strong> Graphic.MovablePoint的方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>setRoute( [<a href="#polyline">Polyline</a>] route )</td>
+<td>this</td>
+<td>设置对象将要移动的路径</td>
+</tr>
+<tr>
+<td>start()</td>
+<td>this</td>
+<td>开始移动</td>
+</tr>
+<tr>
+<td>stop()</td>
+<td>this</td>
+<td>停止移动</td>
+</tr>
+<tr>
+<td>﻿</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-geogrid">地理网格</h3>
+<blockquote>
+<p>模块geogrid提供了地理网格图层及工具类。地理网格是基于经纬度坐标进行划分，并且确保网格面积相等的格网系统。</p>
+<p>Layer.GeoGrid → <a href="#graphic-layer">Layer.Graphic</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">layer</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">GeoGrid</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Proj</span><span class="p">.</span><span class="nx">WebMercator</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">gridOutlineColor</span><span class="o">:</span> <span class="s1">&#39;#ff0&#39;</span>
+<span class="p">});</span>
+<span class="nx">layer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> 构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Layer.GeoGrid( [Number] level, [<a href="#project">ProjectClass</a>] projectClass, [Object] options )</td>
+<td>level为网格划分的层级，projectClass为当前地图与经纬度坐标进行换算的投影类（如G.Proj.WebMercator），options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gridOutline</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否绘制网格的外边线</td>
+</tr>
+<tr>
+<td>gridOutlineColor</td>
+<td>String</td>
+<td>&lsquo;#0f0&rsquo;</td>
+<td>网格外边线的颜色</td>
+</tr>
+<tr>
+<td>gridOutlineWidth</td>
+<td>Number</td>
+<td>2</td>
+<td>网格外边线的线宽</td>
+</tr>
+<tr>
+<td>gridOutlineOpacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>网格外边线的透明度</td>
+</tr>
+<tr>
+<td>gridFill</td>
+<td>Boolean</td>
+<td>true</td>
+<td>是否填充网格</td>
+</tr>
+<tr>
+<td>gridFillColor</td>
+<td>String</td>
+<td>&lsquo;#000&rsquo;</td>
+<td>网格填充的颜色</td>
+</tr>
+<tr>
+<td>gridFillOpacity</td>
+<td>Number</td>
+<td>0.3</td>
+<td>网格填充的透明度</td>
+</tr>
+</tbody>
+</table>
+<p><strong> 方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>getGridByIndex( [Number] ix, [Number] iy )</td>
+<td><a href="#graphic">Graphic</a></td>
+<td>通过序号获取网格对象</td>
+</tr>
+<tr>
+<td>getGridByLL( [Number] lon, [Number] lat )</td>
+<td><a href="#graphic">Graphic</a></td>
+<td>通过经纬度坐标获取网格对象</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="module-fluid">Fluid</h3>
+<blockquote>
+<p>模块fluid提供了流体场（比如风、洋流等）的动画功能，该模块目前只在支持Canvas的浏览器中有效</p>
+<p>Layer.Fluid → <a href="#layer">Layer</a></p>
+</blockquote>
+<p><strong> 示例 </strong></p>
+<div class="codehilite"><pre><span class="nx">fluidLayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">G</span><span class="p">.</span><span class="nx">Layer</span><span class="p">.</span><span class="nx">Fluid</span><span class="p">();</span>
+<span class="nx">fluidLayer</span><span class="p">.</span><span class="nx">addTo</span><span class="p">(</span><span class="nx">map</span><span class="p">);</span>
+</pre></div>
+
+
+<p><strong> Layer.Fluid的构造 </strong></p>
+<table>
+<thead>
+<tr>
+<th>构造函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G.Layer.Fluid( [Object] options )</td>
+<td>options为可选的构造选项</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Layer.Fluid的构造选项 </strong></p>
+<table>
+<thead>
+<tr>
+<th>选项名</th>
+<th>类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gridPixels</td>
+<td>Number</td>
+<td>4</td>
+<td>用于插值的网格像素边长</td>
+</tr>
+<tr>
+<td>gridMaxDivs</td>
+<td>Number</td>
+<td>200</td>
+<td>最大网格边划分数量</td>
+</tr>
+<tr>
+<td>gridReduceFactor</td>
+<td>Number</td>
+<td>2</td>
+<td>在移动设备上适当减少网格数量的比例</td>
+</tr>
+<tr>
+<td>fieldFactor</td>
+<td>Number</td>
+<td>0.8</td>
+<td>流体场的长度绘制因子</td>
+</tr>
+<tr>
+<td>fieldMaxIntensity</td>
+<td>Number</td>
+<td>50</td>
+<td>可视化时限制的流体场最大强度</td>
+</tr>
+<tr>
+<td>particleMaxAge</td>
+<td>Number</td>
+<td>100</td>
+<td>粒子的最大生命长度</td>
+</tr>
+<tr>
+<td>particleCountFactor</td>
+<td>Number</td>
+<td>0.05</td>
+<td>粒子数量的缩减因子，该值为期望的粒子数与网格节点的比值</td>
+</tr>
+<tr>
+<td>lineWidth</td>
+<td>Number</td>
+<td>1.2</td>
+<td>粒子路径绘制的线宽</td>
+</tr>
+<tr>
+<td>opacity</td>
+<td>Number</td>
+<td>1.0</td>
+<td>粒子路径绘制的透明度</td>
+</tr>
+<tr>
+<td>colors</td>
+<td>Array</td>
+<td>[&lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;, &lsquo;#fff&rsquo;]</td>
+<td>粒子路径绘制的颜色列表</td>
+</tr>
+<tr>
+<td>searchSteps</td>
+<td>Number</td>
+<td>3</td>
+<td>插值时搜索附近数据点的最大尝试次数，每次尝试会讲前一次搜索范围扩大一倍</td>
+</tr>
+<tr>
+<td>frameDuration</td>
+<td>Number</td>
+<td>50</td>
+<td>动画帧之间的间隔时间，单位毫秒</td>
+</tr>
+</tbody>
+</table>
+<p><strong> Layer.Fluid的方法 </strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>返回值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>addDataPoint( [Number] x, [Number] y, [Number] u, [Number] v, [Boolean] redrawNow  )</td>
+<td>[Number]</td>
+<td>添加一个数据点，返回该数据点的id</td>
+</tr>
+<tr>
+<td>removeDataPoint( [Number] id, [Boolean] redrawNow )</td>
+<td>this</td>
+<td>根据id移除一个数据点</td>
+</tr>
+<tr>
+<td>calcField( [Number] x, [Number] y )</td>
+<td>Array</td>
+<td>计算指定坐标处的场，结果为一个三维数组，[u方向值, v方向值, 场强]，如果该处无结果则返回[NaN, NaN, null]</td>
+</tr>
+<tr>
+<td>clear([Boolean] forbidRedraw)</td>
+<td>this</td>
+<td>清除图层</td>
+</tr>
+<tr>
+<td>start()</td>
+<td>this</td>
+<td>开始播放动画</td>
+</tr>
+<tr>
+<td>stop()</td>
+<td>this</td>
+<td>停止播放动画</td>
+</tr>
+<tr>
+<td>isPlaying()</td>
+<td>Boolean</td>
+<td>返回是否正在播放动画</td>
+</tr>
+</tbody>
+</table>
+
+            
+            </div>
+
+
+            <div class="col-sm-1 col-md-1">
+                <a class="affix btn btn-default btn-sm" href="#title"><span class="glyphicon glyphicon-circle-arrow-up"></span><br>顶部</a>
+            </div>
+
+        </div>
+    </div>
+
+
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript">
+
+		G.ready(function() {
+			$('#version').text(G.version);
+
+			$('#link-sdk').text('geohey-js-sdk-' + G.version + '.zip');
+			$('#link-sdk').attr('href', 'http://dist.geohey.com/g-js/geohey-js-sdk-' + G.version + '.zip');
+		});
+
+</script>
+
+</body>

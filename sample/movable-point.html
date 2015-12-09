@@ -1,0 +1,76 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%">
+	<div id="mapContainer" style="width: 100%; height: 100%; background:#ccc"></div>
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer');
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+			tileLayer.addTo(map);
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			G.loadModule('movable', function() {
+
+				var r, movePoint;
+				var routes = [];
+
+				for (var i = 0; i < 3; i++) {
+					var route = [];
+
+					for (var j = 0; j < 5; j++) {
+						var point = [];
+
+						point[0] = -2e7 + 4e7 * Math.random();
+						point[1] = -2e7 + 4e7 * Math.random();
+
+						route.push(point);
+					}
+
+					routes.push(route);
+
+					r = new G.Graphic.Polyline(route, null, {
+						lineDashArray: [4, 4],
+						lineWidth: 1,
+						lineColor: '#00f',
+						lineOpacity: 0.5
+					});
+					r.addTo(graphicLayer);
+
+					movePoint = new G.Graphic.MovablePoint(route[0], null, {
+						shape: 'image',
+						size: [24, 24],
+						offset: [-12, -12],
+						image: 'images/boot{i}.png',
+						clickable: false,
+						duration: 5000
+					});
+					movePoint.addTo(graphicLayer);
+
+					movePoint.setRoute(route);
+					movePoint.start();
+
+				}
+
+
+			});
+
+		});
+
+	</script>
+	
+</body>
+</html>

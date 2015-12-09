@@ -1,0 +1,235 @@
+.g-container {
+	z-index: 0;
+	font-family: "Helvetica Neue", Helvetica, "Microsoft YaHei", Arial;
+	-webkit-font-smoothing: antialiased;
+	overflow: hidden;
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
+	position: relative;
+	-ms-touch-action: none;
+}
+
+.g-dragging,
+.g-dragging .g-container  {
+	cursor: url('./images/grabbing.cur'), move;
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
+}
+
+.g-clickable,
+.g-clickable .g-container  {
+	cursor: pointer;
+}
+
+.g-focus,
+.g-focus .g-container {
+	cursor: default;
+}
+
+.g-edit,
+.g-edit .g-container {
+	cursor: crosshair;
+}
+
+.g-map-frame,
+.g-layers-frame,
+.g-mask-frame,
+.g-tile,
+.g-tile-container,
+.g-label,
+.g-label-container,
+.g-graphic-container,
+.g-html,
+.g-html-container,
+.g-image,
+.g-image-container,
+.g-zoom-box,
+.g-layer,
+.g-vml,
+.g-compass,
+.g-spark,
+.g-popup {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.g-panel-frame{
+	z-index: 10000000;
+}
+
+.g-compass{
+	left: auto;
+	right: 0;
+	width: 64px;
+	height: 64px;
+	background-image: url('./images/compass.png');
+	background-repeat: no-repeat;
+	opacity: 0;
+	filter: alpha(opacity=0);
+	cursor: pointer;
+}
+
+.retina .g-compass{
+	background-image: url('./images/compass@2x.png');
+	background-size: 100%;
+	-moz-background-size:100%;
+}
+
+.ielt9 .g-compass{
+	z-index: 10000000;
+	background: none;
+	src: '../../dist/lib/images/compass.png'; /* 注意，该值用于IE7/8，图片为相对HTML页面的路径，与一般CSS值不同 */
+}
+
+.g-spark{
+}
+
+.g-popup{
+	z-index: 1000000;
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	-moz-transition: opacity 0.2s linear;
+	-o-transition: opacity 0.2s linear;
+	transition: opacity 0.2s linear;
+}
+
+.g-popup-wrapper{
+	box-shadow: 0 0 1em #777;
+	-moz-box-shadow: 0 0 1em #777;
+	-webkit-box-shadow: 0 0 1em #777;
+	-o-box-shadow: 0 0 1em #777;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-o-border-radius: 7px;
+	background-color: #444444;
+	color: #fff;
+}
+
+.g-popup-close{
+	position: absolute;
+	background-image: url('./images/popup.png');
+	background-repeat: no-repeat;
+	background-position: 0 -14px;
+	right: -10px;
+	top: -12px;
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+}
+
+.retina .g-popup-close{
+	background-image: url('./images/popup@2x.png');
+	background-size: 100%;
+	-moz-background-size:100%;
+}
+
+.g-popup-content{
+	font-size: 1.2em;
+	border: 2px solid #fff;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	-o-border-radius: 7px;
+}
+
+.g-popup-content-wrapper{
+	margin: 7px;
+	overflow: auto;
+	cursor: default;
+}
+
+.g-popup-pointer{
+	position: absolute;
+	background-image: url('./images/popup.png');
+	background-repeat: no-repeat;
+	left: 50%;	
+	width: 25px;
+	height: 13px;
+	margin-left: -12px;
+	margin-top: -4px;
+}
+
+.retina .g-popup-pointer{
+	background-image: url('./images/popup@2x.png');
+	background-size: 100%;
+	-moz-background-size:100%;
+}
+
+.g-brand {
+	cursor: pointer;
+}
+
+.g-compass,
+.g-tile,
+.g-image,
+.g-popup,
+.g-brand {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+.g-compass,
+.g-tile,
+.g-image{
+	border: none;
+}
+
+.g-tile,
+.g-image {
+	visibility: hidden;
+}
+
+.g-tile-loaded,
+.g-image-loaded {
+	visibility: inherit;
+}
+
+.g-zoom-anim .g-tile,
+.g-pan-anim .g-tile,
+.g-rotate-anim .g-tile,
+.g-zoom-anim .g-label,
+.g-pan-anim .g-label,
+.g-rotate-anim .g-label {
+	-webkit-transition: none;
+	-moz-transition: none;
+	-o-transition: none;
+	transition: none;
+}
+
+.g-zoom-anim .g-zoom-hide {
+	visibility: hidden;
+}
+
+.g-zoom-box {
+	width: 0;
+	height: 0;
+	background: black;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	z-index: 100000;
+}
+.g-zoom-box-left {
+	border-right: 2px dotted #f00;
+}
+.g-zoom-box-right {
+	border-left: 2px dotted #f00;
+}
+.g-zoom-box-top {
+	border-bottom: 2px dotted #f00;
+}
+.g-zoom-box-bottom {
+	border-top: 2px dotted #f00;
+}
+
+.g-vml-container {
+	position: absolute;
+}
+
+.g-vml {
+	behavior: url(#default#VML);
+	display: inline-block;
+}

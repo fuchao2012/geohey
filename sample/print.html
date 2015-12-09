@@ -1,0 +1,78 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+
+	<div id="buttonContainer" style="z-index: 1; position: absolute; top: 0px; padding: 10px;">
+		<input id="btn-print" type="button" value="打印" disabled="disabled">
+	</div>
+
+	<script type="text/javascript">
+		var map, tileLayer, graphicLayer;
+
+		G.ready(function() {
+			map = new G.Map('mapContainer', {
+				initStatus: {
+					center: [0, 0],
+					res: 3e4,
+					rotate: 0
+				}
+			});
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+			tileLayer.addTo(map);
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			var x, y, value, g;
+			for (var i = 0; i < 100; i++) {
+				x = -2e7 + 4e7 * Math.random();
+				y = -2e7 + 4e7 * Math.random();
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'image',
+					size: [25, 40],
+					offset: [-12, -40],
+					image: '../lib/images/pin{i}.png'
+				});
+				g.addTo(graphicLayer);
+			}
+
+			g = new G.Graphic.Point([0, 0], null, {
+				shape: 'text',
+				size: [32],
+				offset: [0, -16],
+				fillColor: '#444',
+				fillOpacity: 0.5,
+				text: '点击左上角的打印按钮',
+				textFont: 'Microsoft YaHei',
+				textStyle: 'bold'
+			});
+			g.addTo(graphicLayer);
+
+
+			if (map.isPrintable()) {
+				$('#btn-print').removeAttr('disabled');
+			}
+
+		});
+
+
+		$('#btn-print').bind('click', function() {
+			var imageData = map.print(512, 512);
+			window.location.href = imageData;
+		});
+	</script>
+	
+</body>
+</html>

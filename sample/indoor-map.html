@@ -1,0 +1,345 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="../3rd/jquery.min.js"></script>
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript">
+	// G_OFF_CANVAS = true;
+</script>
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<style type="text/css">
+
+	body{
+		font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial;
+		-webkit-font-smoothing: antialiased;
+		margin: 0; 
+		padding:0; 
+		width: 100%; 
+		height: 100%; 
+		background:#101010;
+	}
+
+	.g-popup-close, .g-popup-pointer{
+		visibility: hidden;
+	}
+
+	.g-popup-content, .retina .g-popup-content{
+		border: 0;
+	}
+
+	#mall-name{
+		text-shadow: 0px 0px 8px #fff;
+		color: #000;
+		font-weight: bold;
+	}
+
+	.nav {
+	  list-style: none;
+	  text-align: center;
+	  padding: 0px;
+	  margin: 0px;
+	}
+	.nav li {
+	  position: relative;
+	  display: inline-block;
+	  margin-right: -4px;
+	}
+	.nav a:link, .nav a:visited {
+	  display: block;
+	  text-decoration: none;
+	  background-color: #000;
+	  color: #fff;
+	  margin: 8px;
+	  padding: 4px;
+	  width: 24px;
+	  height: 24px;
+	  position: relative;
+	  text-align: center;
+	  font-size: 15px;
+	  line-height: 22px;
+	  border-radius: 50%;
+	  box-shadow: 0px 0px 3px #333, inset 0px 0px 3px #000;
+	  border: solid 1px transparent;
+	}
+	.nav a:active {
+	  box-shadow: none;
+	  border: solid 1px #000;
+	}
+	.nav a:hover {
+	  text-decoration: none;
+	  color: #ddd;
+	}
+
+</style>
+
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%" >
+	<div id="mapContainer" style="width: 100%; height: 100%; background:#fff"></div>
+	<div style="z-index: 1; position: absolute; bottom: 0px; width: 100%; text-align: center">
+		<h3 id="mall-name"></h3>
+	</div>
+	<div style="z-index: 1; position: absolute; top: 0px; padding: 10px;">
+		<nav>
+			<ul class="nav">
+			    <li>
+			      <a href="javascript:zoomIn()">+</a>
+			  	</li>
+			    <li>
+			      <a href="javascript:zoomOut()">-</a>
+			     </li>
+			</ul>	
+		</nav>
+	</div>
+	<div style="z-index: 1; position: absolute; bottom: 0px; padding: 10px; right: 0px;">
+		<nav>
+			<ul id="ul-floors" class="nav">
+			</ul>	
+		</nav>
+	</div>
+
+	<script type="text/javascript">
+		if (window.location.origin=='file://') {
+			alert('本示例需部署在Web服务器下方可运行');
+		};
+
+		var map, shapeLayer, markerLayer;
+
+		var floors;
+
+		G.ready(function() {
+
+			map = new G.Map('mapContainer', {
+				wrap: false,
+				maxExtent: [0, 0, 90, 80],
+				minRes: 0.02,
+				maxRes: 0.2,
+				initStatus: {
+					center: [40, 40],
+					res: 0.1,
+					rotate: 0
+				}
+			});
+
+			shapeLayer = new G.Layer.Graphic();
+			shapeLayer.addTo(map);
+
+			shapeLayer.addListener('graphicClicked', function(e){
+				var g = e.graphic;
+				if(g.attrs.name){
+					map.showPopup(g.attrs.center, g.attrs.name);
+				}else{
+					map.hidePopup();
+				}
+			});
+
+			markerLayer = new G.Layer.Graphic();
+			markerLayer.addTo(map);
+
+			map.addListener('click', function(){
+				map.hidePopup();
+			});
+
+			map.addListener('zoomEnd', function(){
+				ensureMarkersViz();
+			});
+
+			loadMall();
+		});
+
+ 		function zoomIn(){
+ 			if(map){
+ 				map.zoomIn();
+ 			}
+ 		}
+
+ 		function zoomOut(){
+ 			if(map){
+ 				map.zoomOut();
+ 			}
+ 		}
+
+ 		function loadMall(){
+ 			var url = './data/indoor/index.xml';
+ 			G.Util.ajax(url, {
+ 				responseType: 'XML',
+ 				success: function(xhr, data){
+ 					var name = data.documentElement.getAttribute("name");
+
+ 					floors = data.getElementsByTagName("floor");
+
+ 					$('#mall-name').text(name);
+
+ 					var floor = floors[0];
+ 					var floorId = floor.getAttribute("id");
+ 					var floorName = floor.getAttribute("string");
+ 					loadFloor(floorId, floorName);
+ 				}
+ 			});
+ 		}
+
+ 		function showFloors(){
+			map.hidePopup();
+ 			$('#ul-floors').html('');
+
+ 			for(var i=floors.length-1; i>=0; i--){
+ 				var floor = floors[i];
+
+ 				var floorId = floor.getAttribute("id");
+ 				var floorName = floor.getAttribute("string");
+
+ 				$('#ul-floors').prepend('<li><a href="javascript:loadFloor('+floorId+',\''+floorName+'\');">'+floorName+'</a></li>');
+ 			}
+ 		}
+
+ 		function loadFloor(id, name){
+ 			shapeLayer.clear();
+ 			markerLayer.clear();
+
+ 			$('#ul-floors').html('<li><a href="javascript:showFloors();">' + name + '</a></li>');
+
+ 			var url = './data/indoor/' + id + '.xml';
+ 			G.Util.ajax(url, {
+ 				responseType: 'XML',
+ 				success: function(xhr, data){
+
+ 					var features = data.getElementsByTagName("feature");
+ 					for(var i=features.length-1; i>=0; i--){
+ 						var feature = features[i];
+
+ 						var id = feature.getAttribute("id");
+ 						var name = feature.getAttribute("name");
+ 						var url = feature.getAttribute("url");
+ 						var type = feature.getAttribute("type");
+ 						var center = feature.getElementsByTagName("center")[0];
+ 						var centerX = parseFloat(center.getAttribute("x"));
+ 						var centerY = parseFloat(center.getAttribute("y"));
+
+ 						var nds = feature.getElementsByTagName("nd");
+ 						var pts = [];
+ 						for(var j=nds.length-1; j>=0; j--){
+ 							var nd = nds[j];
+ 							var ndX = parseFloat(nd.getAttribute("x"));
+ 							var ndY = parseFloat(nd.getAttribute("y"));
+
+ 							pts.push([ndX, ndY]);
+ 						}
+
+ 						var shapeOptions = {
+							fillOpacity: 1.0
+ 						};
+
+ 						if(type == '0'){
+ 							shapeOptions.outline = false;
+							shapeOptions.fillImage = 'images/icons/honey_dark.png';
+							shapeOptions.fillImageSize = [90, 66];
+ 						}else{
+ 							shapeOptions.clickable = true;
+ 							shapeOptions.outlineWidth = 1;
+ 							shapeOptions.outlineColor = '#fff';
+							shapeOptions.fillImageSize = [256, 256];
+							shapeOptions.fillColor = '#099';
+
+							var mod = Math.random();
+							if(mod<0.2){
+								shapeOptions.fillImage = 'images/icons/Blue.png';
+							}else if(mod<0.4){
+								shapeOptions.fillImage = 'images/icons/Chartreuse.png';
+							}else if(mod<0.6){
+								shapeOptions.fillImage = 'images/icons/Purple.png';
+							}else if(mod<0.7){
+								shapeOptions.fillImage = 'images/icons/Red.png';
+							}else{
+								shapeOptions.fillImage = 'images/icons/Yellow.png';
+							}
+ 						}
+
+ 						var g = new G.Graphic.Polygon([pts], {
+ 							id: id,
+ 							name: name,
+ 							url: url,
+ 							type: type,
+ 							center: [centerX, centerY]
+ 						}, shapeOptions);
+	 					g.addTo(shapeLayer);
+
+ 						var pt = G.GeomUtil.labelPoint(g.geom);
+ 						var attrs = {
+ 							outer: g.bbox
+ 						};
+ 						if(name){
+	 						if('Toilet' == name){
+		 						var m = new G.Graphic.Point(pt, attrs, {
+		 							shape: 'image',
+									size: [20, 20],
+									offset: [-10, -10],
+									image: 'images/icons/toilet.png',
+									clickable: false
+		 						});
+		 						m.addTo(markerLayer);
+	 						}else if('Escalator' == name){
+		 						var m = new G.Graphic.Point(pt, attrs, {
+		 							shape: 'image',
+									size: [20, 20],
+									offset: [-10, -10],
+									image: 'images/icons/stairs.png',
+									clickable: false
+		 						});
+		 						m.addTo(markerLayer);
+	 						}else if('Elevator' == name){
+		 						var m = new G.Graphic.Point(pt, attrs, {
+		 							shape: 'image',
+									size: [20, 20],
+									offset: [-10, -10],
+									image: 'images/icons/elevator.png',
+									clickable: false
+		 						});
+		 						m.addTo(markerLayer);
+	 						}else{
+		 						var m = new G.Graphic.Point(pt, attrs, {
+		 							shape: 'text',
+									size: [18],
+									fillColor: '#222',
+									fillOpacity: 0.7,
+									text: name,
+									clickable: false
+		 						});
+		 						m.addTo(markerLayer);
+	 						}
+
+	 					}
+
+
+ 					}
+
+ 					ensureMarkersViz();
+ 				}
+ 			});
+ 		}
+
+ 		function ensureMarkersViz(){
+ 			var res = map.getResolution();
+ 			var all = markerLayer.all();
+ 			for(var i in all){
+ 				var g = all[i];
+ 				var text = g.options.text;
+ 				var outer = g.attrs.outer;
+ 				var outerWidth = outer[2] - outer[0];
+ 				var textWidth = g.options.size[0] * text.length * res;
+
+ 				if(outerWidth<textWidth && res>0.06){
+ 					g.updateOptions({
+ 						fillOpacity: 0
+ 					});
+ 				}else{
+ 					g.updateOptions({
+ 						fillOpacity: 0.7
+ 					});
+ 				}
+ 			}
+ 		}
+
+	</script>
+</body>
+</html>

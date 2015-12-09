@@ -1,0 +1,118 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+<style type="text/css">
+	.g-popup-close{
+		display: none;
+	}
+	.g-popup-pointer{
+		display: none;
+	}
+	.g-popup-content{
+		border: none;
+		min-width: 100px;
+		text-align: center;
+	}
+	.g-popup-wrapper {
+	    box-shadow: none;
+	    -moz-box-shadow: none;
+	    -webkit-box-shadow: none;
+	    -o-box-shadow: none;
+	    background: none;
+	}
+</style>
+</head>
+
+<body style="margin: 0; padding:0; overflow: hidden; width: 100%; height: 100%">
+	<div id="mapContainer" style="width: 100%; height: 100%; background:#000"></div>
+
+	<script type="text/javascript" src="./data/wind.js"></script>
+	<script type="text/javascript">
+		var map, tileLayer, heatLayer, fluidLayer;
+		
+		G.ready(function() {
+			map = new G.Map('mapContainer', {
+				wrap:false,
+				maxRes: 19567.879241,
+				minRes: 1222.9924525625,
+				initStatus:{
+					center: [6616996, 4374301],
+					res: 9783.9396205
+				}
+			});
+
+			map.addListener('click', function(e){
+				var field = fluidLayer.calcField(e.mapX, e.mapY);
+				map.showPopup([e.mapX, e.mapY], parseInt(field[2]) + ' m/s');
+			});
+
+			G.loadModules(['maps', 'heat', 'fluid'], function() {
+
+				tileLayer = new G.Layer.QQMap('sate');	
+				tileLayer.addTo(map);
+
+				heatLayer = new G.Layer.Heat({
+					topValue:50, 
+					radius:5e5, 
+					radiusUnit:'map',
+					maxOpacity: 0.8,
+					minOpacity: 0.2,
+					colors: {
+						0.1: '#3461fc',
+						0.2: '#00a7fc',
+						0.3: '#00cdd2',
+						0.4: '#00d862',
+						0.5: '#00ef2d',
+						0.6: '#85ed2d',
+						0.7: '#ffd127',
+						0.8: '#f59121',
+						0.9: '#d83d34',
+						1.0: '#e72876'
+					}
+				});
+				heatLayer.addTo(map);
+
+				fluidLayer = new G.Layer.Fluid({
+					particleCountFactor: 0.06
+				});
+				fluidLayer.addTo(map);
+
+				var us = gfsdata[0];
+				var vs = gfsdata[1];
+
+ 				var cols = us.header.nx;
+ 				var rows = us.header.ny;
+
+				for(var j = 0; j < rows; j+=4){
+					var lat = 90 - 180 * j / rows;
+					if(Math.abs(lat) > 85.1){
+						continue;
+					}
+ 				 	
+				 	for(var i = 0; i < cols; i+=4){
+						var lon = -180 + 360 * i / cols;
+
+						var pt = G.Proj.WebMercator.project(lon, lat);
+
+						var idx = cols * j + i;
+						var u = us.data[idx];
+						var v = vs.data[idx];
+						var m = Math.sqrt(u*u + v*v);
+
+						heatLayer.addDataPoint(pt[0], pt[1], m);
+						fluidLayer.addDataPoint(pt[0], pt[1], u, v);
+					}
+				}
+
+				fluidLayer.start();
+			});
+
+		});
+
+	</script>
+	
+</body>
+</html>

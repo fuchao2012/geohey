@@ -1,0 +1,60 @@
+<!doctype html>
+<html style="width: 100%; height: 100%;">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../lib/g.css">
+<script type="text/javascript" src="../lib/g.min.js"></script>
+
+</head>
+
+<body style="margin: 0; padding:0; width: 100%; height: 100%;" >
+	<div id="mapContainer" style="width: 100%; height: 100%;"></div>
+	<div style="z-index: 1; position:absolute; width: 100%; bottom: 0">
+		<button id='btn-rotate' style="width: 100%; height: 30px; display: none">旋转</button>
+	</div>
+
+
+	<script type="text/javascript">
+		var btn, map, tileLayer, graphicLayer, highlightGraphic;
+
+		G.ready(function() {
+			btn = document.getElementById('btn-rotate');
+			btn.style.display = '';
+			btn.onclick = function() {
+				map.rotateTo(map.getRotate() + 10);
+			};
+
+			map = new G.Map('mapContainer', {
+				wrap: false
+			});
+
+			tileLayer = new G.Layer.Tile('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+				cluster: ['a', 'b', 'c']
+			});
+
+			tileLayer.addTo(map);
+
+			graphicLayer = new G.Layer.Graphic();
+			graphicLayer.addTo(map);
+
+			var x, y, value, g;
+			for (var i = 0; i < 10000; i++) {
+				x = -2e7 + 4e7 * Math.random();
+				y = -2e7 + 4e7 * Math.random();
+				g = new G.Graphic.Point([x, y], null, {
+					shape: 'image',
+					size: [25, 40],
+					offset: [-12, -40],
+					image: '../lib/images/pin{i}.png'
+				});
+				g.addTo(graphicLayer, null, true);
+			}
+
+
+			map.view([0, 0], 1000000, 1000000);
+		});
+
+	</script>
+	
+</body>
+</html>
